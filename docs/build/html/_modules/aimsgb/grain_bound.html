@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>aimsgb.grain_bound &#8212; aimsgb 0.1.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for aimsgb.grain_bound</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">from</span> <span class="nn">tabulate</span> <span class="kn">import</span> <span class="n">tabulate</span>
+<span class="kn">from</span> <span class="nn">fractions</span> <span class="kn">import</span> <span class="n">Fraction</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">sqrt</span><span class="p">,</span> <span class="n">atan</span><span class="p">,</span> <span class="n">degrees</span><span class="p">,</span> <span class="n">pi</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">sin</span><span class="p">,</span> <span class="n">cos</span><span class="p">,</span> <span class="n">ceil</span><span class="p">,</span> <span class="n">radians</span><span class="p">,</span> <span class="n">inner</span><span class="p">,</span> <span class="n">identity</span>
+<span class="kn">from</span> <span class="nn">numpy.linalg</span> <span class="kn">import</span> <span class="n">inv</span><span class="p">,</span> <span class="n">det</span><span class="p">,</span> <span class="n">norm</span><span class="p">,</span> <span class="n">solve</span>
+<span class="kn">from</span> <span class="nn">pymatgen.core.lattice</span> <span class="kn">import</span> <span class="n">Lattice</span>
+<span class="kn">from</span> <span class="nn">pymatgen.symmetry.analyzer</span> <span class="kn">import</span> <span class="n">SpacegroupAnalyzer</span>
+<span class="kn">from</span> <span class="nn">aimsgb</span> <span class="kn">import</span> <span class="n">Grain</span>
+<span class="kn">from</span> <span class="nn">aimsgb.utils</span> <span class="kn">import</span> <span class="n">reduce_vector</span><span class="p">,</span> <span class="n">co_prime</span><span class="p">,</span> <span class="n">plus_minus_gen</span><span class="p">,</span> \
+    <span class="n">is_integer</span><span class="p">,</span> <span class="n">get_smallest_multiplier</span><span class="p">,</span> <span class="n">reduce_integer</span><span class="p">,</span> <span class="n">transpose_matrix</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Jianli Cheng, Kesong Yang&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2018, Yanggroup&quot;</span>
+<span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;Jianli Cheng&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;jic198@ucsd.edu&quot;</span>
+<span class="n">__status__</span> <span class="o">=</span> <span class="s2">&quot;Production&quot;</span>
+<span class="n">__date__</span> <span class="o">=</span> <span class="s2">&quot;January 26, 2018&quot;</span>
+
+<span class="c1"># SIGMA_SYMBOL = u&#39;\u03A3&#39;</span>
+<span class="n">UNIMODULAR_MATRIX</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">identity</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>
+                              <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+                               <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                               <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span>
+                              <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+                               <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                               <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]],</span>
+                              <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+                               <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                               <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]],</span>
+                              <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+                               <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                               <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]])</span>
+<span class="n">STRUCTURE_MATRIX</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">identity</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>
+                             <span class="p">[[</span><span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                              <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                              <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span>
+                             <span class="p">[[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                              <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span>
+                              <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">]]])</span>
+
+
+<div class="viewcode-block" id="reduce_csl"><a class="viewcode-back" href="../../aimsgb.html#aimsgb.grain_bound.reduce_csl">[docs]</a><span class="nd">@transpose_matrix</span>
+<span class="k">def</span> <span class="nf">reduce_csl</span><span class="p">(</span><span class="n">csl</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reduce CSL matrix</span>
+<span class="sd">    Args:</span>
+<span class="sd">        csl: 3x3 matrix</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        3x3 CSL matrix</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">csl</span> <span class="o">=</span> <span class="n">csl</span><span class="o">.</span><span class="n">round</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">reduce_vector</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">csl</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="o_lattice_to_csl"><a class="viewcode-back" href="../../aimsgb.html#aimsgb.grain_bound.o_lattice_to_csl">[docs]</a><span class="nd">@transpose_matrix</span>
+<span class="k">def</span> <span class="nf">o_lattice_to_csl</span><span class="p">(</span><span class="n">o_lattice</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The algorithm was borrowed from gosam project with slight changes.</span>
+<span class="sd">    Link to the project: https://github.com/wojdyr/gosam</span>
+
+<span class="sd">    There are two major steps: (1) Manipulate the columns of O-lattice to get</span>
+<span class="sd">    an integral basis matrix for CSL: make two columns become integers and</span>
+<span class="sd">    the remaining column can be multiplied by n whereby the determinant</span>
+<span class="sd">    becomes sigma. (2) Simplify CSL so its vectors acquire the shortest length:</span>
+<span class="sd">    decrease the integers in the matrix while keeping the determinant the same</span>
+<span class="sd">    by adding other column vectors (row vectors in the following example) to a</span>
+<span class="sd">    column vector. If after the addition or subtraction, the maximum value or</span>
+<span class="sd">    absolute summation of added or subtracted vector is smaller than the</span>
+<span class="sd">    original, then proceed the addition or subtraction.</span>
+<span class="sd">    0 0 -1      0 0 -1      0 0 -1      0 0 -1      0 0 -1</span>
+<span class="sd">    1 2 -1  -&gt;  1 2 0   -&gt;  1 2 0   -&gt;  1 2 0   -&gt;  1 2 0</span>
+<span class="sd">    1 -3 2      1 -3 2      1 -3 1      1 -3 0      2 -1 0</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">     o_lattice (3x3 array): O-lattice in crystal coordinates</span>
+<span class="sd">     n (int): Number of O-lattice units per CSL unit</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">     CSL matrix (3x3 array) in crystal coordinates</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">csl</span> <span class="o">=</span> <span class="n">o_lattice</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">csl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">n</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="p">[</span><span class="n">get_smallest_multiplier</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">csl</span><span class="p">]</span>
+        <span class="n">m_prod</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">m_prod</span> <span class="o">&lt;=</span> <span class="n">n</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+                <span class="n">csl</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*=</span> <span class="n">m</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">m_prod</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="n">n</span> <span class="o">%</span> <span class="n">m_prod</span> <span class="o">==</span> <span class="mi">0</span>
+                <span class="n">csl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*=</span> <span class="n">n</span> <span class="o">/</span> <span class="n">m_prod</span>
+            <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">changed</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">changed</span> <span class="ow">or</span> <span class="n">i</span> <span class="o">==</span> <span class="n">j</span> <span class="ow">or</span> <span class="n">m</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">m</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                    <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span> <span class="k">if</span> <span class="n">m</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">m</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="k">else</span> <span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">plus_minus_gen</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">m</span><span class="p">[</span><span class="n">b</span><span class="p">]):</span>
+                        <span class="n">handle</span> <span class="o">=</span> <span class="n">csl</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">+</span> <span class="n">k</span> <span class="o">*</span> <span class="n">csl</span><span class="p">[</span><span class="n">b</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="n">get_smallest_multiplier</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">m</span><span class="p">[</span><span class="n">a</span><span class="p">]:</span>
+                            <span class="n">csl</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">+=</span> <span class="n">k</span> <span class="o">*</span> <span class="n">csl</span><span class="p">[</span><span class="n">b</span><span class="p">]</span>
+                            <span class="n">changed</span> <span class="o">=</span> <span class="kc">True</span>
+                            <span class="k">break</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">changed</span><span class="p">:</span>
+                <span class="c1"># This situation rarely happens. Not sure if this solution is</span>
+                <span class="c1"># legit, as det not equals to sigma. E.g. Sigma 115[113]</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+                    <span class="n">csl</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*=</span> <span class="n">m</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="k">break</span>
+    <span class="n">csl</span> <span class="o">=</span> <span class="n">csl</span><span class="o">.</span><span class="n">round</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+    <span class="c1"># Reshape CSL</span>
+    <span class="k">def</span> <span class="nf">simplify</span><span class="p">(</span><span class="n">l1</span><span class="p">,</span> <span class="n">l2</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">l1</span> <span class="o">+</span> <span class="n">l2</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">l1</span><span class="p">)</span>
+        <span class="n">changed</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">while</span> <span class="nb">max</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">max</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">==</span> <span class="nb">max</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">sum</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">sum</span><span class="p">(</span><span class="n">y</span><span class="p">)):</span>
+            <span class="n">l1</span> <span class="o">+=</span> <span class="n">l2</span>
+            <span class="n">changed</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">l1</span> <span class="o">+</span> <span class="n">l2</span><span class="p">)</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">l1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">changed</span>
+
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">changed</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">j</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">changed</span><span class="p">:</span>
+                    <span class="n">changed</span> <span class="o">=</span> <span class="n">simplify</span><span class="p">(</span><span class="n">csl</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">csl</span><span class="p">[</span><span class="n">j</span><span class="p">])</span> <span class="ow">or</span> <span class="n">simplify</span><span class="p">(</span><span class="n">csl</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="o">-</span><span class="n">csl</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="n">changed</span><span class="p">:</span>
+                        <span class="k">break</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">changed</span><span class="p">:</span>
+            <span class="k">break</span>
+    <span class="k">return</span> <span class="n">csl</span></div>
+
+
+<div class="viewcode-block" id="orthogonalize_csl"><a class="viewcode-back" href="../../aimsgb.html#aimsgb.grain_bound.orthogonalize_csl">[docs]</a><span class="nd">@transpose_matrix</span>
+<span class="k">def</span> <span class="nf">orthogonalize_csl</span><span class="p">(</span><span class="n">csl</span><span class="p">,</span> <span class="n">axis</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    (1) Set the 3rd column of csl same as the rotation axis. The algorithm was</span>
+<span class="sd">    borrowed from gosam project with slight changes. Link to the project:</span>
+<span class="sd">    https://github.com/wojdyr/gosam</span>
+<span class="sd">    (2) Orthogonalize CSL, which is essentially a Gram-Schmidt process. At the</span>
+<span class="sd">    same time, we want to make sure the column vectors of orthogonalized csl</span>
+<span class="sd">    has the smallest value possible. That&#39;s why we compared two different ways.</span>
+<span class="sd">    csl = [v1, v2, v3], vi is the column vector</span>
+<span class="sd">    u1 = v3/||v3||, y2 = v1 - (v1 . u1)u1</span>
+<span class="sd">    u2 = y2/||y2||, y3 = v3 - [(v3 . u1)u1 + (v3 . u2)u2]</span>
+<span class="sd">    u3 = y3/||y3||</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">axis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">axis</span><span class="p">)</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">solve</span><span class="p">(</span><span class="n">csl</span><span class="o">.</span><span class="n">transpose</span><span class="p">(),</span> <span class="n">axis</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">is_integer</span><span class="p">(</span><span class="n">c</span><span class="p">):</span>
+        <span class="n">mult</span> <span class="o">=</span> <span class="n">get_smallest_multiplier</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+        <span class="n">c</span> <span class="o">*=</span> <span class="n">mult</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">round</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">ind</span> <span class="o">=</span> <span class="nb">min</span><span class="p">([(</span><span class="n">i</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="mi">0</span><span class="p">)],</span>
+              <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]))[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">ind</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">csl</span><span class="p">[</span><span class="n">ind</span><span class="p">],</span> <span class="n">csl</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">csl</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="o">-</span><span class="n">csl</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span>
+        <span class="n">c</span><span class="p">[</span><span class="n">ind</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="o">-</span><span class="n">c</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span>
+
+    <span class="n">csl</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">csl</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">c</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">csl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span>
+
+    <span class="k">def</span> <span class="nf">get_integer</span><span class="p">(</span><span class="n">vec</span><span class="p">):</span>
+        <span class="c1"># Used vec = np.array(vec, dtype=float) before, but does not work for</span>
+        <span class="c1"># [5.00000000e-01, -5.00000000e-01,  2.22044605e-16] in Sigma3[112]</span>
+        <span class="n">vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>
+        <span class="n">vec_sign</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span> <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">==</span> <span class="n">i</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">vec</span><span class="p">])</span>
+        <span class="n">vec</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">vec</span><span class="p">))</span>
+        <span class="n">new_vec</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="mf">0.0</span> <span class="ow">in</span> <span class="n">vec</span><span class="p">:</span>
+            <span class="n">zero_ind</span> <span class="o">=</span> <span class="n">vec</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">vec</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">zero_ind</span><span class="p">)</span>
+            <span class="k">if</span> <span class="mf">0.0</span> <span class="ow">in</span> <span class="n">vec</span><span class="p">:</span>
+                <span class="n">new_vec</span> <span class="o">=</span> <span class="p">[</span><span class="n">get_smallest_multiplier</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span> <span class="o">*</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">vec</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">frac</span> <span class="o">=</span> <span class="n">Fraction</span><span class="p">(</span><span class="n">vec</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">vec</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">limit_denominator</span><span class="p">()</span>
+                <span class="n">new_vec</span> <span class="o">=</span> <span class="p">[</span><span class="n">frac</span><span class="o">.</span><span class="n">numerator</span><span class="p">,</span> <span class="n">frac</span><span class="o">.</span><span class="n">denominator</span><span class="p">]</span>
+            <span class="n">new_vec</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">zero_ind</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">frac</span> <span class="o">=</span> <span class="n">Fraction</span><span class="p">(</span><span class="n">vec</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">/</span> <span class="n">vec</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">limit_denominator</span><span class="p">()</span>
+                <span class="n">new_vec</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">frac</span><span class="o">.</span><span class="n">numerator</span><span class="p">,</span> <span class="n">frac</span><span class="o">.</span><span class="n">denominator</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">new_vec</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">new_vec</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span>
+                <span class="n">new_vec</span> <span class="o">=</span> <span class="p">[</span><span class="n">new_vec</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">new_vec</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">new_vec</span><span class="p">[</span><span class="mi">3</span><span class="p">]]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">new_vec</span> <span class="o">=</span> <span class="n">reduce_vector</span><span class="p">([</span><span class="n">new_vec</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">new_vec</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+                                         <span class="n">new_vec</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">new_vec</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+                                         <span class="n">new_vec</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">*</span> <span class="n">new_vec</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
+        <span class="k">assert</span> <span class="n">is_integer</span><span class="p">(</span><span class="n">new_vec</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">new_vec</span> <span class="o">*</span> <span class="n">vec_sign</span>
+
+    <span class="n">u1</span> <span class="o">=</span> <span class="n">csl</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">/</span> <span class="n">norm</span><span class="p">(</span><span class="n">csl</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+    <span class="n">y2_1</span> <span class="o">=</span> <span class="n">csl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">csl</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">u1</span><span class="p">)</span> <span class="o">*</span> <span class="n">u1</span>
+    <span class="n">c0_1</span> <span class="o">=</span> <span class="n">get_integer</span><span class="p">(</span><span class="n">y2_1</span><span class="p">)</span>
+    <span class="n">y2_2</span> <span class="o">=</span> <span class="n">csl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">csl</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">u1</span><span class="p">)</span> <span class="o">*</span> <span class="n">u1</span>
+    <span class="n">c0_2</span> <span class="o">=</span> <span class="n">get_integer</span><span class="p">(</span><span class="n">y2_2</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">c0_1</span><span class="p">))</span> <span class="o">&gt;</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">c0_2</span><span class="p">)):</span>
+        <span class="n">u2</span> <span class="o">=</span> <span class="n">y2_2</span> <span class="o">/</span> <span class="n">norm</span><span class="p">(</span><span class="n">y2_2</span><span class="p">)</span>
+        <span class="n">y3</span> <span class="o">=</span> <span class="n">csl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">csl</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">u1</span><span class="p">)</span> <span class="o">*</span> <span class="n">u1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">csl</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">u2</span><span class="p">)</span> <span class="o">*</span> <span class="n">u2</span>
+        <span class="n">csl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_integer</span><span class="p">(</span><span class="n">y3</span><span class="p">)</span>
+        <span class="n">csl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">c0_2</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">u2</span> <span class="o">=</span> <span class="n">y2_1</span> <span class="o">/</span> <span class="n">norm</span><span class="p">(</span><span class="n">y2_1</span><span class="p">)</span>
+        <span class="n">y3</span> <span class="o">=</span> <span class="n">csl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">csl</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">u1</span><span class="p">)</span> <span class="o">*</span> <span class="n">u1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">csl</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">u2</span><span class="p">)</span> <span class="o">*</span> <span class="n">u2</span>
+        <span class="n">csl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">c0_1</span>
+        <span class="n">csl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_integer</span><span class="p">(</span><span class="n">y3</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">csl</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">csl</span><span class="p">[</span><span class="n">j</span><span class="p">]),</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Non-orthogonal basis: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">csl</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">csl</span><span class="o">.</span><span class="n">round</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GBInformation"><a class="viewcode-back" href="../../aimsgb.html#aimsgb.grain_bound.GBInformation">[docs]</a><span class="k">class</span> <span class="nc">GBInformation</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    GBInformation object essentially consists of a dictionary with information</span>
+<span class="sd">    including sigma, CSL matrix, GB plane, rotation angle and rotation matrix</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">max_sigma</span><span class="p">,</span> <span class="n">specific</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a GBInformation object.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            axis ([u, v, w]): Rotation axis.</span>
+<span class="sd">            max_sigma (int): The largest sigma value</span>
+<span class="sd">            specific (bool): Whether collecting information for a specific sigma</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">GBInformation</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">max_sigma</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Sigma should be larger than 2. &#39;1&#39; or &#39;2&#39; &quot;</span>
+                             <span class="s2">&quot;means a layer by layer epitaxial film.&quot;</span><span class="p">)</span>
+
+        <span class="n">axis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">reduce_vector</span><span class="p">(</span><span class="n">axis</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axis</span> <span class="o">=</span> <span class="n">axis</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_sigma</span> <span class="o">=</span> <span class="n">max_sigma</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">specific</span> <span class="o">=</span> <span class="n">specific</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_gb_info</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">axis_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="p">))</span>
+        <span class="n">outs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Grain boundary information for rotation axis: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">axis_str</span><span class="p">,</span>
+                <span class="s2">&quot;Show the sigma values up to </span><span class="si">%s</span><span class="s2"> (Note: * means twist GB)&quot;</span>
+                <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_sigma</span><span class="p">)]</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">to_s</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%.2f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">x</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s2">&quot;plane&quot;</span><span class="p">]):</span>
+                <span class="n">count</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+                <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+                    <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="n">plane_str</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
+                    <span class="k">if</span> <span class="n">v</span> <span class="o">==</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="p">):</span>
+                        <span class="n">plane_str</span> <span class="o">+=</span> <span class="s2">&quot;*&quot;</span>
+                    <span class="k">if</span> <span class="n">count</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">row</span> <span class="o">=</span> <span class="p">[</span><span class="n">key</span><span class="p">,</span> <span class="n">to_s</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s2">&quot;theta&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">])]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">row</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+                    <span class="n">csl</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%2s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">j</span><span class="p">)</span>
+                           <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s2">&quot;csl&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">]]</span>
+                    <span class="n">row</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s2">&quot;(</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="n">plane_str</span><span class="p">,</span> <span class="n">csl</span><span class="p">[</span><span class="n">count</span><span class="p">]])</span>
+                    <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+        <span class="n">outs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tabulate</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">numalign</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="n">tablefmt</span><span class="o">=</span><span class="s1">&#39;orgtbl&#39;</span><span class="p">,</span>
+                             <span class="n">headers</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Sigma&quot;</span><span class="p">,</span> <span class="s2">&quot;Theta&quot;</span><span class="p">,</span> <span class="s2">&quot;GB Plane&quot;</span><span class="p">,</span> <span class="s2">&quot;CSL&quot;</span><span class="p">]))</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="GBInformation.get_gb_info"><a class="viewcode-back" href="../../aimsgb.html#aimsgb.grain_bound.GBInformation.get_gb_info">[docs]</a>    <span class="k">def</span> <span class="nf">get_gb_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate sigma, rotation angle, GB plane, rotation matrix and CSL matrix</span>
+<span class="sd">        The algorithm for getting sigma, m, n, theta is from H. Grimmer:</span>
+<span class="sd">        https://doi.org/10.1107/S0108767384000246</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            gb_info(dict)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">max_m</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ceil</span><span class="p">(</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_sigma</span><span class="p">)))</span>
+        <span class="n">gb_info</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">defaultdict</span><span class="p">(</span><span class="nb">dict</span><span class="p">)</span>
+        <span class="n">sigma_theta</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_m</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_m</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">co_prime</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+                    <span class="k">continue</span>
+                <span class="n">sigma</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_sigma</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">specific</span> <span class="ow">and</span> <span class="n">sigma</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_sigma</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">sigma</span> <span class="ow">or</span> <span class="n">sigma</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_sigma</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">theta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_theta</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+                <span class="n">sigma_theta</span><span class="p">[</span><span class="n">sigma</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">theta</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">sigma_theta</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot find any matching GB. Most likely there &quot;</span>
+                             <span class="s2">&quot;is no sigma </span><span class="si">%s%s</span><span class="s2"> GB.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_sigma</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">sigma</span> <span class="ow">in</span> <span class="n">sigma_theta</span><span class="p">:</span>
+            <span class="n">sigma_theta</span><span class="p">[</span><span class="n">sigma</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">sigma_theta</span><span class="p">[</span><span class="n">sigma</span><span class="p">],</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">min_theta</span> <span class="o">=</span> <span class="n">sigma_theta</span><span class="p">[</span><span class="n">sigma</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">rot_matrix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_rotate_matrix</span><span class="p">(</span><span class="n">min_theta</span><span class="p">)</span>
+            <span class="n">csl_matrix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_csl_matrix</span><span class="p">(</span><span class="n">sigma</span><span class="p">,</span> <span class="n">rot_matrix</span><span class="p">)</span>
+            <span class="n">csl</span> <span class="o">=</span> <span class="n">orthogonalize_csl</span><span class="p">(</span><span class="n">csl_matrix</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="p">)</span>
+            <span class="c1"># Sometime when getting CSL from O-lattice, det not equals to sigma.</span>
+            <span class="c1"># That&#39;s why it needs to be reduced. E.g. Sigma 115[113]</span>
+            <span class="n">csl</span> <span class="o">=</span> <span class="n">reduce_csl</span><span class="p">(</span><span class="n">csl</span><span class="p">)</span>
+            <span class="n">all_csl</span> <span class="o">=</span> <span class="p">[</span><span class="n">csl</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="p">)</span> <span class="o">==</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]:</span>
+                <span class="n">ind</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                    <span class="n">m</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="n">sigma_theta</span><span class="p">[</span><span class="n">sigma</span><span class="p">][</span><span class="n">ind</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span>
+                    <span class="n">ext_csl</span> <span class="o">=</span> <span class="n">csl</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ext_csl</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">!=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]:</span>
+                            <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&gt;</span> <span class="nb">abs</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+                                <span class="n">ext_csl</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="nb">abs</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">m</span><span class="p">,</span> <span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="nb">abs</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">n</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">ext_csl</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="nb">abs</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">n</span><span class="p">,</span> <span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="nb">abs</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">m</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">csl</span> <span class="o">==</span> <span class="n">ext_csl</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+                        <span class="n">ind</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">break</span>
+                <span class="n">all_csl</span> <span class="o">=</span> <span class="p">[</span><span class="n">csl</span><span class="p">,</span> <span class="n">ext_csl</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">ind</span><span class="p">:</span>
+                    <span class="n">gb_info</span><span class="p">[</span><span class="n">sigma</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;theta&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">min_theta</span><span class="p">,</span> <span class="mi">90</span> <span class="o">-</span> <span class="n">min_theta</span><span class="p">]}</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">gb_info</span><span class="p">[</span><span class="n">sigma</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;theta&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">90</span> <span class="o">-</span> <span class="n">min_theta</span><span class="p">,</span> <span class="n">min_theta</span><span class="p">]}</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">gb_info</span><span class="p">[</span><span class="n">sigma</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;theta&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">min_theta</span><span class="p">]}</span>
+
+            <span class="n">gb_info</span><span class="p">[</span><span class="n">sigma</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;plane&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="nb">list</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">i</span><span class="o">.</span><span class="n">transpose</span><span class="p">()]</span>
+                                             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">all_csl</span><span class="p">],</span>
+                                   <span class="s2">&quot;rot_matrix&quot;</span><span class="p">:</span> <span class="n">rot_matrix</span><span class="p">,</span> <span class="s2">&quot;csl&quot;</span><span class="p">:</span> <span class="n">all_csl</span><span class="p">})</span>
+        <span class="k">return</span> <span class="n">gb_info</span></div>
+
+<div class="viewcode-block" id="GBInformation.get_theta"><a class="viewcode-back" href="../../aimsgb.html#aimsgb.grain_bound.GBInformation.get_theta">[docs]</a>    <span class="k">def</span> <span class="nf">get_theta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate rotation angle from m, n</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            m (int)</span>
+<span class="sd">            n (int)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            theta</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">degrees</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">atan</span><span class="p">(</span><span class="n">n</span> <span class="o">*</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="p">))</span> <span class="o">/</span> <span class="n">m</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">ZeroDivisionError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">degrees</span><span class="p">(</span><span class="n">pi</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GBInformation.get_sigma"><a class="viewcode-back" href="../../aimsgb.html#aimsgb.grain_bound.GBInformation.get_sigma">[docs]</a>    <span class="k">def</span> <span class="nf">get_sigma</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate sigma from m, n</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            m (int)</span>
+<span class="sd">            n (int)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            sigma</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sigma</span> <span class="o">=</span> <span class="n">m</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">n</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">inner</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="p">)</span>
+        <span class="n">alph</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">while</span> <span class="n">sigma</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">sigma</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">alph</span> <span class="o">*=</span> <span class="mi">2</span>
+            <span class="n">sigma</span> <span class="o">//=</span> <span class="mi">2</span>
+        <span class="k">return</span> <span class="n">sigma</span> <span class="k">if</span> <span class="n">sigma</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="GBInformation.get_rotate_matrix"><a class="viewcode-back" href="../../aimsgb.html#aimsgb.grain_bound.GBInformation.get_rotate_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">get_rotate_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">angle</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        use Rodrigues&#39; rotation formula to get rotation matrix</span>
+<span class="sd">        https://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">rotate_axis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axis</span> <span class="o">/</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="p">)))</span>
+        <span class="n">angle</span> <span class="o">=</span> <span class="n">radians</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span>
+        <span class="n">k_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">rotate_axis</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">rotate_axis</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span>
+                            <span class="p">[</span><span class="n">rotate_axis</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">rotate_axis</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
+                            <span class="p">[</span><span class="o">-</span><span class="n">rotate_axis</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">rotate_axis</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">]])</span>
+        <span class="k">return</span> <span class="n">identity</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">+</span> <span class="n">k_matrix</span> <span class="o">*</span> <span class="n">sin</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span> <span class="o">+</span> \
+               <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">k_matrix</span><span class="p">,</span> <span class="n">k_matrix</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">cos</span><span class="p">(</span><span class="n">angle</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="GBInformation.get_csl_matrix"><a class="viewcode-back" href="../../aimsgb.html#aimsgb.grain_bound.GBInformation.get_csl_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">get_csl_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">rotate_matrix</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate CSL matrix from sigma and rotation matrix. The algorithm is</span>
+<span class="sd">        from H. Grimmer et al. https://doi.org/10.1107/S056773947400043X</span>
+<span class="sd">        For the structure matrix, we will use the identity matrix. Since for</span>
+<span class="sd">        the initial structure that is not primitive cubic, we will transform it</span>
+<span class="sd">        to conventional standard cell.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            sigma (int): Degree of fit</span>
+<span class="sd">            rotate_matrix (3x3 matrix): Rotation matrix</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            3x3 CSL matrix</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">STRUCTURE_MATRIX</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">UNIMODULAR_MATRIX</span><span class="p">:</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">inv</span><span class="p">(</span><span class="n">s</span><span class="p">)),</span> <span class="n">inv</span><span class="p">(</span><span class="n">rotate_matrix</span><span class="p">)),</span> <span class="n">s</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">det</span><span class="p">(</span><span class="n">t</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mf">1e-6</span><span class="p">:</span>
+                <span class="k">break</span>
+        <span class="n">o_lattice</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">inv</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="mi">12</span><span class="p">)</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">sigma</span> <span class="o">/</span> <span class="n">det</span><span class="p">(</span><span class="n">o_lattice</span><span class="p">),</span> <span class="mi">6</span><span class="p">)</span>
+        <span class="n">csl_matrix</span> <span class="o">=</span> <span class="n">o_lattice_to_csl</span><span class="p">(</span><span class="n">o_lattice</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">csl_matrix</span></div></div>
+
+
+<div class="viewcode-block" id="GrainBoundary"><a class="viewcode-back" href="../../aimsgb.html#aimsgb.grain_bound.GrainBoundary">[docs]</a><span class="k">class</span> <span class="nc">GrainBoundary</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A grain boundary (GB) object. The initial structure can be cubic or non-cubic</span>
+<span class="sd">    crystal. If non-cubic, the crystal will be transferred to conventional cell.</span>
+<span class="sd">    The generated GB could be either tilted or twisted based on the given GB</span>
+<span class="sd">    plane. If the GB plane is parallel to the rotation axis, the generated GB</span>
+<span class="sd">    will be a twisted one. Otherwise, tilted.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">plane</span><span class="p">,</span> <span class="n">initial_struct</span><span class="p">,</span> <span class="n">uc_a</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">uc_b</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Build grain boundary based on rotation axis, sigma, GB plane, grain size,</span>
+<span class="sd">        if_model and vacuum thickness.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            axis ([u, v, w]): Rotation axis.</span>
+<span class="sd">            sigma (int): The area ratio between the unit cell of CSL and the</span>
+<span class="sd">                given crystal lattice.</span>
+<span class="sd">            plane ([h, k, l]): Miller index of GB plane. If the GB plane is parallel</span>
+<span class="sd">                to the rotation axis, the generated GB will be a twist GB. If they</span>
+<span class="sd">                are perpendicular, the generated GB will be a tilt GB.</span>
+<span class="sd">            initial_struct (Grain): Initial input structure. Must be an</span>
+<span class="sd">                object of Grain</span>
+<span class="sd">            uc_a (int): Number of unit cell of grain A. Default to 1.</span>
+<span class="sd">            uc_b (int): Number of unit cell of grain B. Default to 1.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">initial_struct</span><span class="p">,</span> <span class="n">Grain</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The input &#39;initial_struct&#39; must be an object &quot;</span>
+                             <span class="s2">&quot;of Grain.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axis</span> <span class="o">=</span> <span class="n">axis</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plane</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">plane</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plane_str</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">plane</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">sigma</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">reduce_sigma</span> <span class="o">=</span> <span class="n">reduce_integer</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> is an even number. However sigma must be an odd number. &quot;</span>
+                <span class="s2">&quot;We will choose sigma=</span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sigma</span><span class="p">,</span> <span class="n">reduce_sigma</span><span class="p">),</span>
+                <span class="ne">RuntimeWarning</span><span class="p">)</span>
+            <span class="n">sigma</span> <span class="o">=</span> <span class="n">reduce_sigma</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sigma</span> <span class="o">=</span> <span class="n">sigma</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gb_info</span> <span class="o">=</span> <span class="n">GBInformation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sigma</span><span class="p">,</span> <span class="n">specific</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gb_direction</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">csl</span><span class="o">.</span><span class="n">transpose</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">plane</span> <span class="o">==</span> <span class="nb">list</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">gb_direction</span> <span class="o">=</span> <span class="n">i</span>
+        <span class="n">sg</span> <span class="o">=</span> <span class="n">SpacegroupAnalyzer</span><span class="p">(</span><span class="n">initial_struct</span><span class="p">)</span>
+        <span class="n">new_s</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">get_conventional_standard_structure</span><span class="p">()</span>
+        <span class="n">initial_struct</span> <span class="o">=</span> <span class="n">Grain</span><span class="o">.</span><span class="n">from_sites</span><span class="p">(</span><span class="n">new_s</span><span class="p">[:])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_grain_a</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grain_b</span> <span class="o">=</span> <span class="n">initial_struct</span><span class="o">.</span><span class="n">build_grains</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">csl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gb_direction</span><span class="p">,</span> <span class="n">uc_a</span><span class="p">,</span> <span class="n">uc_b</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">rot_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Rotation matrix for calculating CSL matrix</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">gb_info</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">sigma</span><span class="p">][</span><span class="s2">&quot;rot_matrix&quot;</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">theta</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Rotation angle for calculating rotation matrix and to bring two grains</span>
+<span class="sd">        into a perfect match</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">gb_info</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">sigma</span><span class="p">][</span><span class="s2">&quot;theta&quot;</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">csl</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        CSL matrix</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gb_info</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">sigma</span><span class="p">][</span><span class="s2">&quot;plane&quot;</span><span class="p">]):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">plane</span> <span class="ow">in</span> <span class="n">v</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">gb_info</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">sigma</span><span class="p">][</span><span class="s2">&quot;csl&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">avail_plane</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">j</span><span class="p">))</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">i</span><span class="p">])</span>
+                                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">gb_info</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">sigma</span><span class="p">][</span><span class="s2">&quot;plane&quot;</span><span class="p">]])</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The given GB plane &#39;</span><span class="si">%s</span><span class="s2">&#39; cannot be realized. Choose &quot;</span>
+                         <span class="s2">&quot;the plane in [</span><span class="si">%s</span><span class="s2">]&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plane_str</span><span class="p">,</span> <span class="n">avail_plane</span><span class="p">))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">grain_a</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Grain class instance for grain A</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grain_a</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">grain_b</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Grain class instance for grain B</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grain_b</span>
+
+<div class="viewcode-block" id="GrainBoundary.build_gb"><a class="viewcode-back" href="../../aimsgb.html#aimsgb.grain_bound.GrainBoundary.build_gb">[docs]</a>    <span class="k">def</span> <span class="nf">build_gb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vacuum</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">add_if_dist</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">to_primitive</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">delete_layer</span><span class="o">=</span><span class="s2">&quot;0b0t0b0t&quot;</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">0.25</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Build the GB based on the given crystal, uc of grain A and B, if_model,</span>
+<span class="sd">        vacuum thickness, distance between two grains and tolerance factor.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            vacuum (float), Angstrom: Vacuum thickness for GB.</span>
+<span class="sd">                Default to 0.0</span>
+<span class="sd">            add_if_dist (float), Angstrom: Add extra distance at the interface</span>
+<span class="sd">                between two grains.</span>
+<span class="sd">                Default to 0.0</span>
+<span class="sd">            to_primitive (bool): Whether to get primitive structure of GB.</span>
+<span class="sd">                Default to true.</span>
+<span class="sd">            delete_layer (str): Delete interface layers on both sides of each grain.</span>
+<span class="sd">                8 characters in total. The first 4 characters is for grain A and</span>
+<span class="sd">                the other 4 is for grain B. &quot;b&quot; means bottom layer and &quot;t&quot; means</span>
+<span class="sd">                top layer. Integer represents the number of layers to be deleted.</span>
+<span class="sd">                Default to &quot;0b0t0b0t&quot;, which means no deletion of layers. The</span>
+<span class="sd">                direction of top and bottom layers is based on gb_direction.</span>
+<span class="sd">            tol (float), Angstrom: Tolerance factor to determine whether two</span>
+<span class="sd">                atoms are at the same plane.</span>
+<span class="sd">                Default to 0.25</span>
+<span class="sd">        Returns:</span>
+<span class="sd">             GB structure (Grain)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ind</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gb_direction</span>
+        <span class="n">delete_layer</span> <span class="o">=</span> <span class="n">delete_layer</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">delete</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">&#39;(\d+)(\w)&#39;</span><span class="p">,</span> <span class="n">delete_layer</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">delete</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;</span><span class="si">%s</span><span class="s2">&#39; is not supported. Please make sure the format &quot;</span>
+                             <span class="s2">&quot;is 0b0t0b0t.&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">delete</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">])):</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">grain_a</span><span class="o">.</span><span class="n">delete_bt_layer</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">tol</span><span class="p">,</span> <span class="n">ind</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">grain_b</span><span class="o">.</span><span class="n">delete_bt_layer</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">tol</span><span class="p">,</span> <span class="n">ind</span><span class="p">)</span>
+        <span class="n">abc_a</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grain_a</span><span class="o">.</span><span class="n">lattice</span><span class="o">.</span><span class="n">abc</span><span class="p">)</span>
+        <span class="n">abc_b</span><span class="p">,</span> <span class="n">angles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grain_b</span><span class="o">.</span><span class="n">lattice</span><span class="o">.</span><span class="n">parameters</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">ind</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">l</span> <span class="o">=</span> <span class="p">(</span><span class="n">abc_a</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">+</span> <span class="n">add_if_dist</span><span class="p">)</span> <span class="o">*</span> <span class="n">sin</span><span class="p">(</span><span class="n">radians</span><span class="p">(</span><span class="n">angles</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">l</span> <span class="o">=</span> <span class="n">abc_a</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">+</span> <span class="n">add_if_dist</span>
+        <span class="n">abc_a</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">+=</span> <span class="n">abc_b</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">add_if_dist</span> <span class="o">+</span> <span class="n">vacuum</span>
+        <span class="n">new_lat</span> <span class="o">=</span> <span class="n">Lattice</span><span class="o">.</span><span class="n">from_parameters</span><span class="p">(</span><span class="o">*</span><span class="n">abc_a</span><span class="p">,</span> <span class="o">*</span><span class="n">angles</span><span class="p">)</span>
+        <span class="n">a_fcoords</span> <span class="o">=</span> <span class="n">new_lat</span><span class="o">.</span><span class="n">get_fractional_coords</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grain_a</span><span class="o">.</span><span class="n">cart_coords</span><span class="p">)</span>
+
+        <span class="n">grain_a</span> <span class="o">=</span> <span class="n">Grain</span><span class="p">(</span><span class="n">new_lat</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">grain_a</span><span class="o">.</span><span class="n">species</span><span class="p">,</span> <span class="n">a_fcoords</span><span class="p">)</span>
+        <span class="n">l_vector</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="n">l_vector</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">ind</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span>
+        <span class="n">b_fcoords</span> <span class="o">=</span> <span class="n">new_lat</span><span class="o">.</span><span class="n">get_fractional_coords</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">grain_b</span><span class="o">.</span><span class="n">cart_coords</span> <span class="o">+</span> <span class="n">l_vector</span><span class="p">)</span>
+        <span class="n">grain_b</span> <span class="o">=</span> <span class="n">Grain</span><span class="p">(</span><span class="n">new_lat</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">grain_b</span><span class="o">.</span><span class="n">species</span><span class="p">,</span> <span class="n">b_fcoords</span><span class="p">)</span>
+
+        <span class="n">gb</span> <span class="o">=</span> <span class="n">Grain</span><span class="o">.</span><span class="n">from_sites</span><span class="p">(</span><span class="n">grain_a</span><span class="p">[:]</span> <span class="o">+</span> <span class="n">grain_b</span><span class="p">[:])</span>
+        <span class="n">gb</span> <span class="o">=</span> <span class="n">gb</span><span class="o">.</span><span class="n">get_sorted_structure</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">to_primitive</span><span class="p">:</span>
+            <span class="n">gb</span> <span class="o">=</span> <span class="n">gb</span><span class="o">.</span><span class="n">get_primitive_structure</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">gb</span></div></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">aimsgb</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">aimsgb</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, Jianli Cheng.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

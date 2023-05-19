@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>aimsgb.agb &#8212; aimsgb 0.1.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for aimsgb.agb</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">mp_api.client</span> <span class="kn">import</span> <span class="n">MPRester</span>
+
+<span class="kn">from</span> <span class="nn">aimsgb</span> <span class="kn">import</span> <span class="n">Grain</span><span class="p">,</span> <span class="n">GBInformation</span><span class="p">,</span> <span class="n">GrainBoundary</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Jianli Cheng and Kesong YANG&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright (C) 2018 The Regents of the University of California&quot;</span>
+<span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;Jianli Cheng&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;jic198@ucsd.edu&quot;</span>
+<span class="n">__status__</span> <span class="o">=</span> <span class="s2">&quot;Production&quot;</span>
+<span class="n">__date__</span> <span class="o">=</span> <span class="s2">&quot;January 26, 2018&quot;</span>
+<span class="n">aimsgb_descript</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;**************************************************************************************************</span>
+<span class="s2">       aimsgb - Ab-initio Interface Materials Simulation for Grain Boundaries (aimsgb.org)      </span>
+<span class="s2">                        VERSION 0.1  2017 - 2018                                    </span>
+<span class="s2">Aimsgb is one open-source python library to generate periodic grain boundary structures.    </span>
+<span class="s2">A reference for the usage of aimsgb software is:</span>
+<span class="s2">Jianli Cheng, Jian Luo, and Kesong Yang, Aimsgb: An Algorithm and Open-Source Python Library  </span>
+<span class="s2">to Generate Periodic Grain Boundary Structures, Comput. Mater. Sci. 155, 92-103, (2018). </span>
+<span class="s2">**************************************************************************************************</span>
+
+<span class="s2">Aimsgb Command Line Tools </span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="gb_list"><a class="viewcode-back" href="../../aimsgb.html#aimsgb.agb.gb_list">[docs]</a><span class="k">def</span> <span class="nf">gb_list</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+    <span class="n">axis</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">axis</span><span class="p">))</span>
+    <span class="n">sigma</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">sigma</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">GBInformation</span><span class="p">(</span><span class="n">axis</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span><span class="o">.</span><span class="fm">__str__</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="gb"><a class="viewcode-back" href="../../aimsgb.html#aimsgb.agb.gb">[docs]</a><span class="k">def</span> <span class="nf">gb</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+    <span class="n">axis</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">axis</span><span class="p">))</span>
+    <span class="n">plane</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">plane</span>
+    <span class="n">initial_struct</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">filename</span><span class="p">:</span>
+        <span class="n">initial_struct</span> <span class="o">=</span> <span class="n">Grain</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">mpid</span><span class="p">:</span>
+        <span class="n">mpr</span> <span class="o">=</span> <span class="n">MPRester</span><span class="p">()</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">mpr</span><span class="o">.</span><span class="n">get_structure_by_material_id</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">mpid</span><span class="p">)</span>
+        <span class="n">initial_struct</span> <span class="o">=</span> <span class="n">Grain</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">as_dict</span><span class="p">())</span>
+    <span class="k">if</span> <span class="n">initial_struct</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Please provide either filename or mpid.&quot;</span><span class="p">)</span>
+    
+    <span class="n">gb</span> <span class="o">=</span> <span class="n">GrainBoundary</span><span class="p">(</span><span class="n">axis</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">sigma</span><span class="p">,</span> <span class="n">plane</span><span class="p">,</span> <span class="n">initial_struct</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">uc_a</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">uc_b</span><span class="p">)</span>
+    <span class="n">to_primitive</span> <span class="o">=</span> <span class="kc">False</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">conventional</span> <span class="k">else</span> <span class="kc">True</span>
+    <span class="n">gb</span><span class="o">.</span><span class="n">build_gb</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">vacuum</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">add_if_dist</span><span class="p">,</span> <span class="n">to_primitive</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">delete_layer</span><span class="p">,</span>
+                <span class="n">args</span><span class="o">.</span><span class="n">tol</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">out</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">fmt</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;CSL Matrix (det=</span><span class="si">%.1f</span><span class="s2">):</span><span class="se">\n</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">gb</span><span class="o">.</span><span class="n">csl</span><span class="p">),</span> <span class="n">gb</span><span class="o">.</span><span class="n">csl</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> of sigma</span><span class="si">%s</span><span class="s2">[</span><span class="si">%s</span><span class="s2">]/(</span><span class="si">%s</span><span class="s2">) is created&quot;</span>
+          <span class="o">%</span> <span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">out</span><span class="p">,</span> <span class="n">gb</span><span class="o">.</span><span class="n">sigma</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">axis</span><span class="p">,</span> <span class="n">gb</span><span class="o">.</span><span class="n">plane_str</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../aimsgb.html#aimsgb.agb.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="n">aimsgb_descript</span><span class="p">,</span>
+                                     <span class="n">formatter_class</span><span class="o">=</span><span class="n">argparse</span><span class="o">.</span><span class="n">RawTextHelpFormatter</span><span class="p">)</span>
+    <span class="n">subparsers</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">add_subparsers</span><span class="p">(</span><span class="n">help</span><span class="o">=</span><span class="s2">&quot;command&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;command&quot;</span><span class="p">)</span>
+
+    <span class="n">parser_gb_list</span> <span class="o">=</span> <span class="n">subparsers</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span>
+        <span class="s2">&quot;list&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Show the values of sigma, theta, GB plane and CSL matrix &quot;</span>
+        <span class="s2">&quot;from a given rotation axis</span><span class="se">\n</span><span class="s2">EXAMPLE: aimsgb list 001&quot;</span><span class="p">,</span>
+        <span class="n">formatter_class</span><span class="o">=</span><span class="n">argparse</span><span class="o">.</span><span class="n">RawTextHelpFormatter</span><span class="p">)</span>
+    <span class="n">parser_gb_list</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;axis&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;rotation axis&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+                                <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The rotation axis of GB</span><span class="se">\n</span><span class="s2">&quot;</span>
+                                <span class="s2">&quot;EXAMPLE: aimsgb list 001&quot;</span><span class="p">)</span>
+    <span class="n">parser_gb_list</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;sigma&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;?&quot;</span><span class="p">,</span>
+                                <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Set the sigma limit for on screen output &quot;</span>
+                                     <span class="s2">&quot;(default: </span><span class="si">%(default)s</span><span class="s2">)</span><span class="se">\n</span><span class="s2">&quot;</span>
+                                     <span class="s2">&quot;EXAMPLE: aimsgb list 001 100&quot;</span><span class="p">)</span>
+    <span class="n">parser_gb_list</span><span class="o">.</span><span class="n">set_defaults</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">gb_list</span><span class="p">)</span>
+
+    <span class="n">parser_gb</span> <span class="o">=</span> <span class="n">subparsers</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span>
+        <span class="s2">&quot;gb&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Build grain boundary based on rotation axis, sigma, GB plane, &quot;</span>
+                   <span class="s2">&quot;and input structure file.</span><span class="se">\n</span><span class="s2">The user can also specify many &quot;</span>
+                   <span class="s2">&quot;optional arguments, such grain size and interface terminations.&quot;</span>
+                   <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">EXAMPLE1: aimsgb gb 001 5 1 2 0 -f POSCAR&quot;</span>
+                   <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">EXAMPLE2: aimsgb gb 001 5 1 2 0 -mp mp-13 -ua 2 -ub 3&quot;</span>
+                   <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">EXAMPLE3: aimsgb gb 001 5 1 2 0 -f POSCAR -ua 3 -ub 2 -dl 0b1t1b0t&quot;</span><span class="p">,</span>
+        <span class="n">formatter_class</span><span class="o">=</span><span class="n">argparse</span><span class="o">.</span><span class="n">RawTextHelpFormatter</span><span class="p">)</span>
+    <span class="n">parser_gb</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;axis&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;rotation axis&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+                           <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The rotation axis of GB, EXAMPLE: 110&quot;</span><span class="p">)</span>
+    <span class="n">parser_gb</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;sigma&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
+                           <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The sigma value for grain boundary, EXAMPLE: 3&quot;</span><span class="p">)</span>
+    <span class="n">parser_gb</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;plane&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                           <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The GB plane for grain boundary, EXAMPLE: 1 1 0&quot;</span><span class="p">)</span>
+    <span class="n">parser_gb</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-f&quot;</span><span class="p">,</span> <span class="s2">&quot;--filename&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+                           <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The initial structure file for grain boundary.&quot;</span><span class="p">)</span>
+    <span class="n">parser_gb</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-mp&quot;</span><span class="p">,</span> <span class="s2">&quot;--mpid&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+                           <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The mpid to get initial structure from Materials Project.&quot;</span><span class="p">)</span>
+    <span class="n">parser_gb</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-o&quot;</span><span class="p">,</span> <span class="s2">&quot;--out&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;POSCAR&quot;</span><span class="p">,</span> 
+                           <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The output filename. (default: </span><span class="si">%(default)s</span><span class="s2">)&quot;</span><span class="p">)</span>
+    <span class="n">parser_gb</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-ua&quot;</span><span class="p">,</span> <span class="s2">&quot;--uc_a&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
+                           <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The size (uc) for grain A. (default: </span><span class="si">%(default)s</span><span class="s2">)&quot;</span>
+                                <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">EXAMPLE: aimsgb gb 001 5 1 2 0 -f POSCAR -ua 2&quot;</span><span class="p">)</span>
+    <span class="n">parser_gb</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-ub&quot;</span><span class="p">,</span> <span class="s2">&quot;--uc_b&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
+                           <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The size (uc) for grain B. (default: </span><span class="si">%(default)s</span><span class="s2">)&quot;</span>
+                                <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">EXAMPLE: aimsgb gb 001 5 1 2 0 -f POSCAR -ub 2&quot;</span><span class="p">)</span>
+    <span class="n">parser_gb</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-dl&quot;</span><span class="p">,</span> <span class="s2">&quot;--delete_layer&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;0b0t0b0t&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+                           <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Delete bottom or top layers for each grain. &quot;</span>
+                                <span class="s2">&quot;(default: </span><span class="si">%(default)s</span><span class="s2">)&quot;</span>
+                                <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">EXAMPLE: aimsgb gb 001 5 1 2 0 -f POSCAR -dl 0b1t1b0t&quot;</span><span class="p">)</span>
+    <span class="n">parser_gb</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-v&quot;</span><span class="p">,</span> <span class="s2">&quot;--vacuum&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span>
+                           <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Set vacuum thickness for grain boundary. &quot;</span>
+                                <span class="s2">&quot;(default: </span><span class="si">%(default)s</span><span class="s2"> angstrom)&quot;</span>
+                                <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">EXAMPLE: aimsgb gb 001 5 1 2 0 -f POSCAR -v 20&quot;</span><span class="p">)</span>
+    <span class="n">parser_gb</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-t&quot;</span><span class="p">,</span> <span class="s2">&quot;--tol&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span>
+                           <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Tolerance factor to determine if two &quot;</span>
+                                <span class="s2">&quot;atoms are at the same plane. &quot;</span>
+                                <span class="s2">&quot;(default: </span><span class="si">%(default)s</span><span class="s2"> angstrom)&quot;</span>
+                                <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">EXAMPLE: aimsgb gb 001 5 1 2 0 -f POSCAR -dl 0b1t1b0t -t 0.5&quot;</span><span class="p">)</span>
+    <span class="n">parser_gb</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-ad&quot;</span><span class="p">,</span> <span class="s2">&quot;--add_if_dist&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span>
+                           <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Add extra distance between two grains. &quot;</span>
+                                <span class="s2">&quot;(default: </span><span class="si">%(default)s</span><span class="s2"> angstrom)&quot;</span>
+                                <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">EXAMPLE: aimsgb gb 001 5 1 2 0 -f POSCAR -ad 0.5&quot;</span><span class="p">)</span>
+    <span class="n">parser_gb</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-c&quot;</span><span class="p">,</span> <span class="s2">&quot;--conventional&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+                           <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Get conventional GB, not primitive&quot;</span>
+                                <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">EXAMPLE: aimsgb gb 001 5 1 2 0 -f POSCAR -c&quot;</span><span class="p">)</span>
+    <span class="n">parser_gb</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-fmt&quot;</span><span class="p">,</span> <span class="s2">&quot;--fmt&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;poscar&quot;</span><span class="p">,</span> <span class="n">const</span><span class="o">=</span><span class="s2">&quot;poscar&quot;</span><span class="p">,</span>
+                           <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;poscar&quot;</span><span class="p">,</span> <span class="s2">&quot;cif&quot;</span><span class="p">,</span> <span class="s2">&quot;cssr&quot;</span><span class="p">,</span> <span class="s2">&quot;json&quot;</span><span class="p">],</span>
+                           <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Choose the output format. (default: </span><span class="si">%(default)s</span><span class="s2">)&quot;</span>
+                                <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">EXAMPLE: aimsgb gb 001 5 1 2 0 -f POSCAR -fmt cif&quot;</span><span class="p">)</span>
+    <span class="n">parser_gb</span><span class="o">.</span><span class="n">set_defaults</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">gb</span><span class="p">)</span>
+
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="nb">getattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s2">&quot;func&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">print_help</span><span class="p">()</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">args</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="n">args</span><span class="p">)</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">aimsgb</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">aimsgb</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, Jianli Cheng.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

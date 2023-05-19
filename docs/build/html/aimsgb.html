@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>aimsgb package &mdash; aimsgb 0.1.2 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Usage" href="usage.html" />
+    <link rel="prev" title="aimsgb" href="modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            aimsgb
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">aimsgb</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">aimsgb package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-aimsgb.agb">aimsgb.agb module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#aimsgb.agb.gb"><code class="docutils literal notranslate"><span class="pre">gb()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#aimsgb.agb.gb_list"><code class="docutils literal notranslate"><span class="pre">gb_list()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#aimsgb.agb.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-aimsgb.grain">aimsgb.grain module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#aimsgb.grain.Grain"><code class="docutils literal notranslate"><span class="pre">Grain</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-aimsgb.grain_bound">aimsgb.grain_bound module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#aimsgb.grain_bound.GBInformation"><code class="docutils literal notranslate"><span class="pre">GBInformation</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#aimsgb.grain_bound.GrainBoundary"><code class="docutils literal notranslate"><span class="pre">GrainBoundary</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#aimsgb.grain_bound.o_lattice_to_csl"><code class="docutils literal notranslate"><span class="pre">o_lattice_to_csl()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#aimsgb.grain_bound.orthogonalize_csl"><code class="docutils literal notranslate"><span class="pre">orthogonalize_csl()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#aimsgb.grain_bound.reduce_csl"><code class="docutils literal notranslate"><span class="pre">reduce_csl()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-aimsgb.utils">aimsgb.utils module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#aimsgb.utils.co_prime"><code class="docutils literal notranslate"><span class="pre">co_prime()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#aimsgb.utils.gcd"><code class="docutils literal notranslate"><span class="pre">gcd()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#aimsgb.utils.get_smallest_multiplier"><code class="docutils literal notranslate"><span class="pre">get_smallest_multiplier()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#aimsgb.utils.is_integer"><code class="docutils literal notranslate"><span class="pre">is_integer()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#aimsgb.utils.plus_minus_gen"><code class="docutils literal notranslate"><span class="pre">plus_minus_gen()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#aimsgb.utils.reduce_integer"><code class="docutils literal notranslate"><span class="pre">reduce_integer()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#aimsgb.utils.reduce_vector"><code class="docutils literal notranslate"><span class="pre">reduce_vector()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#aimsgb.utils.transpose_matrix"><code class="docutils literal notranslate"><span class="pre">transpose_matrix()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-aimsgb">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">aimsgb</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">aimsgb</a></li>
+      <li class="breadcrumb-item active">aimsgb package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/aimsgb.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="aimsgb-package">
+<h1>aimsgb package<a class="headerlink" href="#aimsgb-package" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-aimsgb.agb">
+<span id="aimsgb-agb-module"></span><h2>aimsgb.agb module<a class="headerlink" href="#module-aimsgb.agb" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="aimsgb.agb.gb">
+<span class="sig-prename descclassname"><span class="pre">aimsgb.agb.</span></span><span class="sig-name descname"><span class="pre">gb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aimsgb/agb.html#gb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aimsgb.agb.gb" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aimsgb.agb.gb_list">
+<span class="sig-prename descclassname"><span class="pre">aimsgb.agb.</span></span><span class="sig-name descname"><span class="pre">gb_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aimsgb/agb.html#gb_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aimsgb.agb.gb_list" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aimsgb.agb.main">
+<span class="sig-prename descclassname"><span class="pre">aimsgb.agb.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aimsgb/agb.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aimsgb.agb.main" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-aimsgb.grain">
+<span id="aimsgb-grain-module"></span><h2>aimsgb.grain module<a class="headerlink" href="#module-aimsgb.grain" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="aimsgb.grain.Grain">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aimsgb.grain.</span></span><span class="sig-name descname"><span class="pre">Grain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lattice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">species</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">charge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validate_proximity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_unit_cell</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords_are_cartesian</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">site_properties</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aimsgb/grain.html#Grain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aimsgb.grain.Grain" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></p>
+<p>We use the Structure class from pymatgen and add several new functions.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="aimsgb.grain.Grain.build_grains">
+<span class="sig-name descname"><span class="pre">build_grains</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">csl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gb_direction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uc_a</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uc_b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aimsgb/grain.html#Grain.build_grains"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aimsgb.grain.Grain.build_grains" title="Permalink to this definition"></a></dt>
+<dd><p>Build structures for grain A and B from CSL matrix, number of unit cell
+of grain A and number of unit cell of grain B. Each grain is essentially
+a supercell for the initial structure.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>csl</strong> (<em>3x3 matrix</em>) – CSL matrix (scaling matrix)</p></li>
+<li><p><strong>gb_direction</strong> (<em>int</em>) – The direction of GB. 0: x, 1: y, 2: z</p></li>
+<li><p><strong>uc_a</strong> (<em>int</em>) – Number of unit cell of grain A. Default to 1.</p></li>
+<li><p><strong>uc_b</strong> (<em>int</em>) – Number of unit cell of grain B. Default to 1.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Grain objects for grain A and B</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aimsgb.grain.Grain.delete_bt_layer">
+<span class="sig-name descname"><span class="pre">delete_bt_layer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aimsgb/grain.html#Grain.delete_bt_layer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aimsgb.grain.Grain.delete_bt_layer" title="Permalink to this definition"></a></dt>
+<dd><p>Delete bottom or top layer of the structure.
+:param bt: Specify whether it’s a top or bottom layer delete. “b”</p>
+<blockquote>
+<div><p>means bottom layer and “t” means top layer.</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tol</strong> (<em>float</em>) – Tolerance factor to determine whether two
+atoms are at the same plane.
+Default to 0.25</p></li>
+<li><p><strong>axis</strong> (<em>int</em>) – The direction of top and bottom layers. 0: x, 1: y, 2: z</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aimsgb.grain.Grain.get_b_from_a">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_b_from_a</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grain_a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">csl</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aimsgb/grain.html#Grain.get_b_from_a"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aimsgb.grain.Grain.get_b_from_a" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aimsgb.grain.Grain.make_supercell">
+<span class="sig-name descname"><span class="pre">make_supercell</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scaling_matrix</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aimsgb/grain.html#Grain.make_supercell"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aimsgb.grain.Grain.make_supercell" title="Permalink to this definition"></a></dt>
+<dd><p>Create a supercell. Very similar to pymatgen’s Structure.make_supercell
+However, we need to make sure that all fractional coordinates that equal
+to 1 will become 0 and the lattice are redefined so that x_c = [0, 0, c]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>scaling_matrix</strong> (<em>3x3 matrix</em>) – The scaling matrix to make supercell.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aimsgb.grain.Grain.set_orthogonal_grain">
+<span class="sig-name descname"><span class="pre">set_orthogonal_grain</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aimsgb/grain.html#Grain.set_orthogonal_grain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aimsgb.grain.Grain.set_orthogonal_grain" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aimsgb.grain.Grain.sort_sites_in_layers">
+<span class="sig-name descname"><span class="pre">sort_sites_in_layers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aimsgb/grain.html#Grain.sort_sites_in_layers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aimsgb.grain.Grain.sort_sites_in_layers" title="Permalink to this definition"></a></dt>
+<dd><p>Sort the sites in a structure layer by layer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tol</strong> (<em>float</em>) – tolerance factor when determine whether two atoms are
+are at the same plane. Angstrom</p></li>
+<li><p><strong>axis</strong> (<em>int</em>) – The direction of top and bottom layers. 0: x, 1: y, 2: z</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Lists with the sites in the same plane as one list.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-aimsgb.grain_bound">
+<span id="aimsgb-grain-bound-module"></span><h2>aimsgb.grain_bound module<a class="headerlink" href="#module-aimsgb.grain_bound" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="aimsgb.grain_bound.GBInformation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aimsgb.grain_bound.</span></span><span class="sig-name descname"><span class="pre">GBInformation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">specific</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aimsgb/grain_bound.html#GBInformation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aimsgb.grain_bound.GBInformation" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
+<p>GBInformation object essentially consists of a dictionary with information
+including sigma, CSL matrix, GB plane, rotation angle and rotation matrix</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="aimsgb.grain_bound.GBInformation.get_csl_matrix">
+<span class="sig-name descname"><span class="pre">get_csl_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotate_matrix</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aimsgb/grain_bound.html#GBInformation.get_csl_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aimsgb.grain_bound.GBInformation.get_csl_matrix" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate CSL matrix from sigma and rotation matrix. The algorithm is
+from H. Grimmer et al. <a class="reference external" href="https://doi.org/10.1107/S056773947400043X">https://doi.org/10.1107/S056773947400043X</a>
+For the structure matrix, we will use the identity matrix. Since for
+the initial structure that is not primitive cubic, we will transform it
+to conventional standard cell.
+:param sigma: Degree of fit
+:type sigma: int
+:param rotate_matrix: Rotation matrix
+:type rotate_matrix: 3x3 matrix</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>3x3 CSL matrix</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aimsgb.grain_bound.GBInformation.get_gb_info">
+<span class="sig-name descname"><span class="pre">get_gb_info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aimsgb/grain_bound.html#GBInformation.get_gb_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aimsgb.grain_bound.GBInformation.get_gb_info" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate sigma, rotation angle, GB plane, rotation matrix and CSL matrix
+The algorithm for getting sigma, m, n, theta is from H. Grimmer:
+<a class="reference external" href="https://doi.org/10.1107/S0108767384000246">https://doi.org/10.1107/S0108767384000246</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>gb_info(dict)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aimsgb.grain_bound.GBInformation.get_rotate_matrix">
+<span class="sig-name descname"><span class="pre">get_rotate_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">angle</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aimsgb/grain_bound.html#GBInformation.get_rotate_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aimsgb.grain_bound.GBInformation.get_rotate_matrix" title="Permalink to this definition"></a></dt>
+<dd><p>use Rodrigues’ rotation formula to get rotation matrix
+<a class="reference external" href="https://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula">https://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula</a></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aimsgb.grain_bound.GBInformation.get_sigma">
+<span class="sig-name descname"><span class="pre">get_sigma</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aimsgb/grain_bound.html#GBInformation.get_sigma"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aimsgb.grain_bound.GBInformation.get_sigma" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate sigma from m, n</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>m</strong> (<em>int</em>) – </p></li>
+<li><p><strong>n</strong> (<em>int</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>sigma</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aimsgb.grain_bound.GBInformation.get_theta">
+<span class="sig-name descname"><span class="pre">get_theta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aimsgb/grain_bound.html#GBInformation.get_theta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aimsgb.grain_bound.GBInformation.get_theta" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate rotation angle from m, n</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>m</strong> (<em>int</em>) – </p></li>
+<li><p><strong>n</strong> (<em>int</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>theta</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="aimsgb.grain_bound.GrainBoundary">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aimsgb.grain_bound.</span></span><span class="sig-name descname"><span class="pre">GrainBoundary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plane</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_struct</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uc_a</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uc_b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aimsgb/grain_bound.html#GrainBoundary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aimsgb.grain_bound.GrainBoundary" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A grain boundary (GB) object. The initial structure can be cubic or non-cubic
+crystal. If non-cubic, the crystal will be transferred to conventional cell.
+The generated GB could be either tilted or twisted based on the given GB
+plane. If the GB plane is parallel to the rotation axis, the generated GB
+will be a twisted one. Otherwise, tilted.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="aimsgb.grain_bound.GrainBoundary.build_gb">
+<span class="sig-name descname"><span class="pre">build_gb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vacuum</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_if_dist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_primitive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delete_layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'0b0t0b0t'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aimsgb/grain_bound.html#GrainBoundary.build_gb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aimsgb.grain_bound.GrainBoundary.build_gb" title="Permalink to this definition"></a></dt>
+<dd><p>Build the GB based on the given crystal, uc of grain A and B, if_model,
+vacuum thickness, distance between two grains and tolerance factor.
+:param vacuum: Vacuum thickness for GB.</p>
+<blockquote>
+<div><p>Default to 0.0</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>add_if_dist</strong> (<em>float</em>) – Add extra distance at the interface
+between two grains.
+Default to 0.0</p></li>
+<li><p><strong>to_primitive</strong> (<em>bool</em>) – Whether to get primitive structure of GB.
+Default to true.</p></li>
+<li><p><strong>delete_layer</strong> (<em>str</em>) – Delete interface layers on both sides of each grain.
+8 characters in total. The first 4 characters is for grain A and
+the other 4 is for grain B. “b” means bottom layer and “t” means
+top layer. Integer represents the number of layers to be deleted.
+Default to “0b0t0b0t”, which means no deletion of layers. The
+direction of top and bottom layers is based on gb_direction.</p></li>
+<li><p><strong>tol</strong> (<em>float</em>) – Tolerance factor to determine whether two
+atoms are at the same plane.
+Default to 0.25</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>GB structure (Grain)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aimsgb.grain_bound.GrainBoundary.csl">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">csl</span></span><a class="headerlink" href="#aimsgb.grain_bound.GrainBoundary.csl" title="Permalink to this definition"></a></dt>
+<dd><p>CSL matrix</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aimsgb.grain_bound.GrainBoundary.grain_a">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">grain_a</span></span><a class="headerlink" href="#aimsgb.grain_bound.GrainBoundary.grain_a" title="Permalink to this definition"></a></dt>
+<dd><p>Grain class instance for grain A</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aimsgb.grain_bound.GrainBoundary.grain_b">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">grain_b</span></span><a class="headerlink" href="#aimsgb.grain_bound.GrainBoundary.grain_b" title="Permalink to this definition"></a></dt>
+<dd><p>Grain class instance for grain B</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aimsgb.grain_bound.GrainBoundary.rot_matrix">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rot_matrix</span></span><a class="headerlink" href="#aimsgb.grain_bound.GrainBoundary.rot_matrix" title="Permalink to this definition"></a></dt>
+<dd><p>Rotation matrix for calculating CSL matrix</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aimsgb.grain_bound.GrainBoundary.theta">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">theta</span></span><a class="headerlink" href="#aimsgb.grain_bound.GrainBoundary.theta" title="Permalink to this definition"></a></dt>
+<dd><p>Rotation angle for calculating rotation matrix and to bring two grains
+into a perfect match</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aimsgb.grain_bound.o_lattice_to_csl">
+<span class="sig-prename descclassname"><span class="pre">aimsgb.grain_bound.</span></span><span class="sig-name descname"><span class="pre">o_lattice_to_csl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">o_lattice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aimsgb/grain_bound.html#o_lattice_to_csl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aimsgb.grain_bound.o_lattice_to_csl" title="Permalink to this definition"></a></dt>
+<dd><p>The algorithm was borrowed from gosam project with slight changes.
+Link to the project: <a class="reference external" href="https://github.com/wojdyr/gosam">https://github.com/wojdyr/gosam</a></p>
+<p>There are two major steps: (1) Manipulate the columns of O-lattice to get
+an integral basis matrix for CSL: make two columns become integers and
+the remaining column can be multiplied by n whereby the determinant
+becomes sigma. (2) Simplify CSL so its vectors acquire the shortest length:
+decrease the integers in the matrix while keeping the determinant the same
+by adding other column vectors (row vectors in the following example) to a
+column vector. If after the addition or subtraction, the maximum value or
+absolute summation of added or subtracted vector is smaller than the
+original, then proceed the addition or subtraction.
+0 0 -1      0 0 -1      0 0 -1      0 0 -1      0 0 -1
+1 2 -1  -&gt;  1 2 0   -&gt;  1 2 0   -&gt;  1 2 0   -&gt;  1 2 0
+1 -3 2      1 -3 2      1 -3 1      1 -3 0      2 -1 0</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>o_lattice</strong> (<em>3x3 array</em>) – O-lattice in crystal coordinates</p></li>
+<li><p><strong>n</strong> (<em>int</em>) – Number of O-lattice units per CSL unit</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>CSL matrix (3x3 array) in crystal coordinates</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aimsgb.grain_bound.orthogonalize_csl">
+<span class="sig-prename descclassname"><span class="pre">aimsgb.grain_bound.</span></span><span class="sig-name descname"><span class="pre">orthogonalize_csl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">csl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aimsgb/grain_bound.html#orthogonalize_csl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aimsgb.grain_bound.orthogonalize_csl" title="Permalink to this definition"></a></dt>
+<dd><p>(1) Set the 3rd column of csl same as the rotation axis. The algorithm was
+borrowed from gosam project with slight changes. Link to the project:
+<a class="reference external" href="https://github.com/wojdyr/gosam">https://github.com/wojdyr/gosam</a>
+(2) Orthogonalize CSL, which is essentially a Gram-Schmidt process. At the
+same time, we want to make sure the column vectors of orthogonalized csl
+has the smallest value possible. That’s why we compared two different ways.
+csl = [v1, v2, v3], vi is the column vector
+u1 = v3/||v3||, y2 = v1 - (v1 . u1)u1
+u2 = y2/||y2||, y3 = v3 - [(v3 . u1)u1 + (v3 . u2)u2]
+u3 = y3/||y3||</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aimsgb.grain_bound.reduce_csl">
+<span class="sig-prename descclassname"><span class="pre">aimsgb.grain_bound.</span></span><span class="sig-name descname"><span class="pre">reduce_csl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">csl</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aimsgb/grain_bound.html#reduce_csl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aimsgb.grain_bound.reduce_csl" title="Permalink to this definition"></a></dt>
+<dd><p>Reduce CSL matrix
+:param csl: 3x3 matrix</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>3x3 CSL matrix</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-aimsgb.utils">
+<span id="aimsgb-utils-module"></span><h2>aimsgb.utils module<a class="headerlink" href="#module-aimsgb.utils" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="aimsgb.utils.co_prime">
+<span class="sig-prename descclassname"><span class="pre">aimsgb.utils.</span></span><span class="sig-name descname"><span class="pre">co_prime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aimsgb/utils.html#co_prime"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aimsgb.utils.co_prime" title="Permalink to this definition"></a></dt>
+<dd><p>Check if two integers are co-prime</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aimsgb.utils.gcd">
+<span class="sig-prename descclassname"><span class="pre">aimsgb.utils.</span></span><span class="sig-name descname"><span class="pre">gcd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">numbers</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aimsgb/utils.html#gcd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aimsgb.utils.gcd" title="Permalink to this definition"></a></dt>
+<dd><p>Get a greatest common divisor for a list of numbers</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aimsgb.utils.get_smallest_multiplier">
+<span class="sig-prename descclassname"><span class="pre">aimsgb.utils.</span></span><span class="sig-name descname"><span class="pre">get_smallest_multiplier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aimsgb/utils.html#get_smallest_multiplier"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aimsgb.utils.get_smallest_multiplier" title="Permalink to this definition"></a></dt>
+<dd><p>Get the smallest multiplier to make the list with all integers
+:param a: A list of numbers
+:type a: list
+:param max_n: The up limit to search multiplier
+:type max_n: int</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The smallest integer multiplier</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aimsgb.utils.is_integer">
+<span class="sig-prename descclassname"><span class="pre">aimsgb.utils.</span></span><span class="sig-name descname"><span class="pre">is_integer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aimsgb/utils.html#is_integer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aimsgb.utils.is_integer" title="Permalink to this definition"></a></dt>
+<dd><p>Check whether the number is integer</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aimsgb.utils.plus_minus_gen">
+<span class="sig-prename descclassname"><span class="pre">aimsgb.utils.</span></span><span class="sig-name descname"><span class="pre">plus_minus_gen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aimsgb/utils.html#plus_minus_gen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aimsgb.utils.plus_minus_gen" title="Permalink to this definition"></a></dt>
+<dd><p>Generate a list of plus and minus alternating integers</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aimsgb.utils.reduce_integer">
+<span class="sig-prename descclassname"><span class="pre">aimsgb.utils.</span></span><span class="sig-name descname"><span class="pre">reduce_integer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">integer</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aimsgb/utils.html#reduce_integer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aimsgb.utils.reduce_integer" title="Permalink to this definition"></a></dt>
+<dd><p>Get the odd number for an integer</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aimsgb.utils.reduce_vector">
+<span class="sig-prename descclassname"><span class="pre">aimsgb.utils.</span></span><span class="sig-name descname"><span class="pre">reduce_vector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vector</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aimsgb/utils.html#reduce_vector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aimsgb.utils.reduce_vector" title="Permalink to this definition"></a></dt>
+<dd><p>Reduce a vector</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aimsgb.utils.transpose_matrix">
+<span class="sig-prename descclassname"><span class="pre">aimsgb.utils.</span></span><span class="sig-name descname"><span class="pre">transpose_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aimsgb/utils.html#transpose_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aimsgb.utils.transpose_matrix" title="Permalink to this definition"></a></dt>
+<dd><p>Transpose the first argument and the return value.
+:param func: The function that uses transpose_matrix as a decorator.</p>
+</dd></dl>
+
+</section>
+<section id="module-aimsgb">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-aimsgb" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="modules.html" class="btn btn-neutral float-left" title="aimsgb" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="usage.html" class="btn btn-neutral float-right" title="Usage" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Jianli Cheng.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
