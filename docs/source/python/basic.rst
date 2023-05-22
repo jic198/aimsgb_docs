@@ -2,12 +2,13 @@
 Basic Usage
 ===============
 
-Let's take Fe Σ5[001]/(120) tilt grain boundary as an example. The initial structure is a BCC lattice structure.::
+Let's take Fe Σ5[001]/(120) tilt grain boundary as an example. The initial structure is a `BCC lattice structure
+<https://next-gen.materialsproject.org/materials/mp-13?material_ids=mp-13>`_::
 
     from aimsgb import GrainBoundary, Grain
 
-    s = Grain.from_file("POSCAR_Fe") 
-    gb = GrainBoundary([0, 0, 1], 5, [1, 2, 0], s)
+    s_input = Grain.from_file("POSCAR_Fe") 
+    gb = GrainBoundary([0, 0, 1], 5, [1, 2, 0], s_input)
     structure = gb.build_gb()
 
 .. image:: images/fig1.png
@@ -15,7 +16,7 @@ Let's take Fe Σ5[001]/(120) tilt grain boundary as an example. The initial stru
 
 To construct a bigger supercell for each grain, say 2 unit cells::
 
-    gb = GrainBoundary([0, 0, 1], 5, [1, 2, 0], s, uc_a=2, uc_b=2)
+    gb = GrainBoundary([0, 0, 1], 5, [1, 2, 0], s_input, uc_a=2, uc_b=2)
     structure = gb.build_gb()
 
 .. image:: images/fig2.png
@@ -23,8 +24,18 @@ To construct a bigger supercell for each grain, say 2 unit cells::
 
 To construct a Fe Σ5[001]/(001) twist grain boundary::
 
-    gb = GrainBoundary([0, 0, 1], 5, [0, 0, 1], s)
+    gb = GrainBoundary([0, 0, 1], 5, [0, 0, 1], s_input)
     structure = gb.build_gb()
 
 .. image:: images/fig3.png
+    :width: 400px
+
+It's possible to shift one of the grain along the grain boundary plane. For example, 
+let's say we want to have one of the grain shifted for 0.2 Å along a-axis::
+
+    gb = GrainBoundary([0, 0, 1], 5, [1, 2, 0], s_input)
+    gb.grain_a.translate_sites(range(len(gb.grain_a)), [0.2, 0, 0])
+    structure = gb.build_gb()
+
+.. image:: images/fig4.png
     :width: 400px
