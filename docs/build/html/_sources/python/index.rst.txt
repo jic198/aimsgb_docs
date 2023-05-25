@@ -6,6 +6,7 @@ Python examples
 .. toctree::
     :maxdepth: 1
 
-    basic
+    BCC_Fe
+    MoS2
 
 More to come.

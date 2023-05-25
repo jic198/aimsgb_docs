@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Basic Usage &mdash; aimsgb 0.1.2 documentation</title>
+  <title>BCC Fe &mdash; aimsgb 0.1.2 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -17,6 +17,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="MoS2 Grain Boundary" href="MoS2.html" />
     <link rel="prev" title="Python examples" href="index.html" /> 
 </head>
 
@@ -48,7 +49,8 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../gui/index.html">GUI example</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Python examples</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Basic Usage</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">BCC Fe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="MoS2.html">MoS2 Grain Boundary</a></li>
 </ul>
 </li>
 </ul>
@@ -68,9 +70,9 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="index.html">Python examples</a></li>
-      <li class="breadcrumb-item active">Basic Usage</li>
+      <li class="breadcrumb-item active">BCC Fe</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/python/basic.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/python/BCC_Fe.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -78,8 +80,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="basic-usage">
-<h1>Basic Usage<a class="headerlink" href="#basic-usage" title="Permalink to this heading"></a></h1>
+  <section id="bcc-fe">
+<h1>BCC Fe<a class="headerlink" href="#bcc-fe" title="Permalink to this heading"></a></h1>
 <p>Let’s take Fe Σ5[001]/(120) tilt grain boundary as an example. The initial structure is a <a class="reference external" href="https://next-gen.materialsproject.org/materials/mp-13?material_ids=mp-13">BCC lattice structure</a>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">aimsgb</span> <span class="kn">import</span> <span class="n">GrainBoundary</span><span class="p">,</span> <span class="n">Grain</span>
 
@@ -88,7 +90,7 @@
 <span class="n">structure</span> <span class="o">=</span> <span class="n">gb</span><span class="o">.</span><span class="n">build_gb</span><span class="p">()</span>
 </pre></div>
 </div>
-<a class="reference internal image-reference" href="../_images/fig1.png"><img alt="../_images/fig1.png" src="../_images/fig1.png" style="width: 400px;" /></a>
+<a class="reference internal image-reference" href="../_images/Fe_fig1.png"><img alt="../_images/Fe_fig1.png" src="../_images/Fe_fig1.png" style="width: 400px;" /></a>
 <p><cite>s_input</cite> can also be created using <cite>from_mp_id</cite> method by giving an <cite>mp_id</cite> from <a class="reference external" href="https://materialsproject.org/">Materials Project</a>.
 The <cite>mp_id</cite> of a BCC Fe is <cite>mp-13</cite>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">s_input</span> <span class="o">=</span> <span class="n">Grain</span><span class="o">.</span><span class="n">from_mp_id</span><span class="p">(</span><span class="s2">&quot;mp-13&quot;</span><span class="p">)</span>
@@ -99,13 +101,13 @@ The <cite>mp_id</cite> of a BCC Fe is <cite>mp-13</cite>:</p>
 <span class="n">structure</span> <span class="o">=</span> <span class="n">gb</span><span class="o">.</span><span class="n">build_gb</span><span class="p">()</span>
 </pre></div>
 </div>
-<a class="reference internal image-reference" href="../_images/fig2.png"><img alt="../_images/fig2.png" src="../_images/fig2.png" style="width: 400px;" /></a>
+<a class="reference internal image-reference" href="../_images/Fe_fig2.png"><img alt="../_images/Fe_fig2.png" src="../_images/Fe_fig2.png" style="width: 400px;" /></a>
 <p>To construct a Fe Σ5[001]/(001) twist grain boundary:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gb</span> <span class="o">=</span> <span class="n">GrainBoundary</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="mi">5</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">s_input</span><span class="p">)</span>
 <span class="n">structure</span> <span class="o">=</span> <span class="n">gb</span><span class="o">.</span><span class="n">build_gb</span><span class="p">()</span>
 </pre></div>
 </div>
-<a class="reference internal image-reference" href="../_images/fig3.png"><img alt="../_images/fig3.png" src="../_images/fig3.png" style="width: 400px;" /></a>
+<a class="reference internal image-reference" href="../_images/Fe_fig3.png"><img alt="../_images/Fe_fig3.png" src="../_images/Fe_fig3.png" style="width: 400px;" /></a>
 <p>It’s possible to shift one of the grain along the grain boundary plane. For example,
 let’s say we want to have one of the grain shifted for 0.2 Å along a-axis:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gb</span> <span class="o">=</span> <span class="n">GrainBoundary</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="mi">5</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">s_input</span><span class="p">)</span>
@@ -113,7 +115,7 @@ let’s say we want to have one of the grain shifted for 0.2 Å along a-axis:</
 <span class="n">structure</span> <span class="o">=</span> <span class="n">gb</span><span class="o">.</span><span class="n">build_gb</span><span class="p">()</span>
 </pre></div>
 </div>
-<a class="reference internal image-reference" href="../_images/fig4.png"><img alt="../_images/fig4.png" src="../_images/fig4.png" style="width: 400px;" /></a>
+<a class="reference internal image-reference" href="../_images/Fe_fig4.png"><img alt="../_images/Fe_fig4.png" src="../_images/Fe_fig4.png" style="width: 400px;" /></a>
 </section>
 
 
@@ -121,6 +123,7 @@ let’s say we want to have one of the grain shifted for 0.2 Å along a-axis:</
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="index.html" class="btn btn-neutral float-left" title="Python examples" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="MoS2.html" class="btn btn-neutral float-right" title="MoS2 Grain Boundary" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
