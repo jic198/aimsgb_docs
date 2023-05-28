@@ -9,5 +9,6 @@ Python examples
     Find_GB
     BCC_Fe
     MoS2
+    Graphene
 
 More to come.

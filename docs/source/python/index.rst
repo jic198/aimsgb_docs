@@ -6,8 +6,9 @@ Python examples
 .. toctree::
     :maxdepth: 1
 
-    Find_GB
     BCC_Fe
     MoS2
+    Graphene
+    Find_GB
 
 More to come.
