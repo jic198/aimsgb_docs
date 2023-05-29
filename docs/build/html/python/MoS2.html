@@ -17,6 +17,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Graphene" href="Graphene.html" />
     <link rel="prev" title="BCC Fe" href="BCC_Fe.html" /> 
 </head>
 
@@ -48,9 +49,10 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../gui/index.html">GUI example</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Python examples</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="Find_GB.html">Find Grain Boundaries</a></li>
 <li class="toctree-l2"><a class="reference internal" href="BCC_Fe.html">BCC Fe</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">MoS2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Graphene.html">Graphene</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Find_GB.html">Find Grain Boundaries</a></li>
 </ul>
 </li>
 </ul>
@@ -94,8 +96,8 @@
 <p>You will see a warning saying “The lattice system of the grain is not orthogonal. aimsgb will find a supercell of the grain structure that is orthogonalized. This may take a while.”
 It took me 3 min to generate the MoS2 grain boundary structure on my laptop. What takes it so long is the process of calculating the transformation matrix. In the future, I may store
 the transformation matrices in a database so that it doesn’t need to be calculated every time.</p>
-<p><cite>s_input</cite> can also be created using <cite>from_mp_id</cite> method by giving an <cite>mp_id</cite> from <a class="reference external" href="https://materialsproject.org/">Materials Project</a>.
-The <cite>mp_id</cite> of MoS2 is <cite>mp-2815</cite>:</p>
+<p><code class="docutils literal notranslate"><span class="pre">s_input</span></code> can also be created using <code class="docutils literal notranslate"><span class="pre">from_mp_id</span></code> method by giving an <code class="docutils literal notranslate"><span class="pre">mp_id</span></code> from <a class="reference external" href="https://materialsproject.org/">Materials Project</a>.
+The <code class="docutils literal notranslate"><span class="pre">mp_id</span></code> of MoS2 is <cite>mp-2815</cite>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">s_input</span> <span class="o">=</span> <span class="n">Grain</span><span class="o">.</span><span class="n">from_mp_id</span><span class="p">(</span><span class="s2">&quot;mp-2815&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -111,6 +113,7 @@ The <cite>mp_id</cite> of MoS2 is <cite>mp-2815</cite>:</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="BCC_Fe.html" class="btn btn-neutral float-left" title="BCC Fe" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Graphene.html" class="btn btn-neutral float-right" title="Graphene" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

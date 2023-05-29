@@ -18,8 +18,8 @@ You will see a warning saying "The lattice system of the grain is not orthogonal
 It took me 3 min to generate the MoS2 grain boundary structure on my laptop. What takes it so long is the process of calculating the transformation matrix. In the future, I may store
 the transformation matrices in a database so that it doesn't need to be calculated every time.
 
-`s_input` can also be created using `from_mp_id` method by giving an `mp_id` from `Materials Project <https://materialsproject.org/>`_. 
-The `mp_id` of MoS2 is `mp-2815`::
+``s_input`` can also be created using ``from_mp_id`` method by giving an ``mp_id`` from `Materials Project <https://materialsproject.org/>`_. 
+The ``mp_id`` of MoS2 is `mp-2815`::
 
     s_input = Grain.from_mp_id("mp-2815") 
 

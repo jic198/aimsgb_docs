@@ -4,13 +4,14 @@ Find Grain Boundaries
 
 In this example, I will show you how to print out available Σ, rotation angles, grain boundary (GB) planes, and coincident site lattice (CSL) matrices from a 
 given rotation axis. The purpose of this method is to provide you the grain boundary information. For example, if you are not sure what the GB plane is for a 
-GB you want to generate, you can find this information in `GBInformation`. Let's say you want to create a Σ3[110] GB, but you are not sure what the available 
-GB planes are. To find this information::
+GB you want to generate, you can find this information in :class:`GBInformation`. Let's say you want to create a Σ3[110] GB, but you are not sure what the available 
+GB planes are. To find this information
+
+.. code-block:: python
 
     from aimsgb import GBInformation
 
     print(GBInformation([1, 1, 0], 30).__str__())
-
 
     Grain boundary information for rotation axis: 110
     Show the sigma values up to 30 (Note: * means twist GB, Theta is the rotation angle)
@@ -35,5 +36,6 @@ GB planes are. To find this information::
     |         |         | (1 -1 5)   | 5 -1  1      |
     |         |         | (1 1 0)*   | 2  5  0      |
 
-Here, I print out the GB information with Σ up to 30. As you can see, the available GB planes for a Σ3[110] GB are `(-1 1 1), (1 -1 2), and (1 1 0)`. 
-`(-1 1 1) and (1 -1 2)` are for tilt GB and `(1 1 0)` is for twist GB. 
+
+Here, I print out the GB information with Σ up to 30. As you can see, the available GB planes for a Σ3[110] GB are ``(-1 1 1)``, ``(1 -1 2)``, and ``(1 1 0)``. 
+``(-1 1 1)`` and ``(1 -1 2)`` are for tilt GB and ``(1 1 0)`` is for twist GB. 

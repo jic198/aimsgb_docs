@@ -14,8 +14,8 @@ Let's take Fe Σ5[001]/(120) tilt grain boundary as an example. The initial stru
 .. image:: images/Fe_fig1.png
     :width: 400px
 
-`s_input` can also be created using `from_mp_id` method by giving an `mp_id` from `Materials Project <https://materialsproject.org/>`_. 
-The `mp_id` of a BCC Fe is `mp-13`::
+``s_input`` can also be created using ``from_mp_id`` method by giving an ``mp_id`` from `Materials Project <https://materialsproject.org/>`_. 
+The ``mp_id`` of a BCC Fe is `mp-13`::
 
     s_input = Grain.from_mp_id("mp-13") 
 
