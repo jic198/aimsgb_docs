@@ -2,4 +2,9 @@
 GUI example
 ============
 
-Coming soon.
+.. toctree::
+    :maxdepth: 1
+
+    BCC_Fe
+
+More to come.
