@@ -85,6 +85,15 @@
   <section id="graphene">
 <h1>Graphene<a class="headerlink" href="#graphene" title="Permalink to this heading"></a></h1>
 <p>Let’s take graphene Σ5[001]/(120) tilt grain boundary as an example. The initial structure can be found from <a class="reference external" href="https://next-gen.materialsproject.org/materials/mp-48?material_ids=mp-48">Materials Project</a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">aimsgb</span> <span class="kn">import</span> <span class="n">GrainBoundary</span><span class="p">,</span> <span class="n">Grain</span>
+
+<span class="n">s_input</span> <span class="o">=</span> <span class="n">Grain</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="s2">&quot;POSCAR_C&quot;</span><span class="p">)</span>
+<span class="n">gb</span> <span class="o">=</span> <span class="n">GrainBoundary</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="mi">5</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">s_input</span><span class="p">)</span>
+<span class="n">structure</span> <span class="o">=</span> <span class="n">gb</span><span class="o">.</span><span class="n">build_gb</span><span class="p">()</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../_images/C_fig1.png"><img alt="../_images/C_fig1.png" src="../_images/C_fig1.png" style="width: 400px;" /></a>
+<a class="reference internal image-reference" href="../_images/C_fig2.png"><img alt="../_images/C_fig2.png" src="../_images/C_fig2.png" style="width: 400px;" /></a>
 </section>
 
 
