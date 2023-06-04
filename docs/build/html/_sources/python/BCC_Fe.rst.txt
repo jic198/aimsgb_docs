@@ -10,7 +10,7 @@ Let's take Fe Σ5[001]/(120) tilt grain boundary as an example. The initial stru
     s_input = Grain.from_file("POSCAR_Fe") 
     gb = GrainBoundary([0, 0, 1], 5, [1, 2, 0], s_input)
     structure = gb.build_gb()
-
+    
 .. image:: images/Fe_fig1.png
     :width: 400px
 

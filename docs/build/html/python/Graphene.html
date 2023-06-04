@@ -94,6 +94,17 @@
 </div>
 <a class="reference internal image-reference" href="../_images/C_fig1.png"><img alt="../_images/C_fig1.png" src="../_images/C_fig1.png" style="width: 400px;" /></a>
 <a class="reference internal image-reference" href="../_images/C_fig2.png"><img alt="../_images/C_fig2.png" src="../_images/C_fig2.png" style="width: 400px;" /></a>
+<p><code class="docutils literal notranslate"><span class="pre">s_input</span></code> can also be created using <code class="docutils literal notranslate"><span class="pre">from_mp_id</span></code> method by giving an <code class="docutils literal notranslate"><span class="pre">mp_id</span></code> from <a class="reference external" href="https://materialsproject.org/">Materials Project</a>.
+The <code class="docutils literal notranslate"><span class="pre">mp_id</span></code> of C is <cite>mp-48</cite>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">s_input</span> <span class="o">=</span> <span class="n">Grain</span><span class="o">.</span><span class="n">from_mp_id</span><span class="p">(</span><span class="s2">&quot;mp-48&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The structure above has two layers of graphenes. To remove the top layer along the c-axis:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">structure</span><span class="o">.</span><span class="n">delete_bt_layer</span><span class="p">(</span><span class="s1">&#39;t&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../_images/C_fig3.png"><img alt="../_images/C_fig3.png" src="../_images/C_fig3.png" style="width: 400px;" /></a>
+<p>Here, <code class="docutils literal notranslate"><span class="pre">t</span></code> means the top layer.</p>
 </section>
 
 

@@ -177,7 +177,7 @@ to 1 will become 0 and the lattice are redefined so that x_c = [0, 0, c]</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="aimsgb.grain.Grain.set_orthogonal_grain">
-<span class="sig-name descname"><span class="pre">set_orthogonal_grain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gb_direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aimsgb/grain.html#Grain.set_orthogonal_grain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aimsgb.grain.Grain.set_orthogonal_grain" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">set_orthogonal_grain</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aimsgb/grain.html#Grain.set_orthogonal_grain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aimsgb.grain.Grain.set_orthogonal_grain" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -194,6 +194,44 @@ are at the same plane. Angstrom</p></li>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Lists with the sites in the same plane as one list.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aimsgb.grain.Grain.stack_grains">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">stack_grains</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grain_a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grain_b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vacuum</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delete_layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'0b0t0b0t'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_primitive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aimsgb/grain.html#Grain.stack_grains"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aimsgb.grain.Grain.stack_grains" title="Permalink to this definition"></a></dt>
+<dd><p>Build an interface structure by stacking two grains along a given direction.
+The grain_b a- and b-vectors will be forced to be the grain_a’s
+a- and b-vectors.
+:param grain_a: Substrate for the interface structure
+:type grain_a: Grain
+:param grain_b: Film for the interface structure
+:type grain_b: Grain
+:param vacuum: Vacuum space above the film in Angstroms. Default to 0.0
+:type vacuum: float
+:param gap: Gap between substrate and film in Angstroms. Default to 0.0
+:type gap: float
+:param direction: Stacking direction of the interface structure. 0: x, 1: y, 2: z.
+:type direction: int
+:param delete_layer: Delete top and bottom layers of the substrate and film.</p>
+<blockquote>
+<div><p>8 characters in total. The first 4 characters is for the substrate and
+the other 4 is for the film. “b” means bottom layer and “t” means
+top layer. Integer represents the number of layers to be deleted.
+Default to “0b0t0b0t”, which means no deletion of layers. The
+direction of top and bottom layers is based on the given direction.</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tol</strong> (<em>float</em>) – Tolerance factor in Angstroms to determine whether two
+atoms are at the same plane. Default to 0.25</p></li>
+<li><p><strong>to_primitive</strong> (<em>bool</em>) – Whether to get primitive structure of GB. Default to true.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>GB structure (Grain)</p>
 </dd>
 </dl>
 </dd></dl>
