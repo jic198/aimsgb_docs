@@ -7,6 +7,7 @@ Python examples
     :maxdepth: 1
 
     BCC_Fe
+    FCC_Ni
     MoS2
     Graphene
     Find_GB
