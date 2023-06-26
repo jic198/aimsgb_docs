@@ -9,7 +9,7 @@ Let's take Ni Σ7[111]/(1 -3 2) tilt grain boundary as an example. The initial s
 
     s_input = Grain.from_file("POSCAR_Ni") 
     gb = GrainBoundary([1, 1, 1], 7, [1, -3, 2], s_input)
-    structure = gb.build_gb()
+    structure = Grain.stack_grains(gb.grain_a, gb.grain_b)
     
 .. image:: images/Ni_fig1.png
     :width: 400px
