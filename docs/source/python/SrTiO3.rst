@@ -36,3 +36,11 @@ We can see that there are 6 layers in each grain.
 .. image:: images/SrTiO3_fig2.png
     :width: 400px
 
+Next, let's fix layer 2 and 3 in each grain::
+
+    gb.grain_a.fix_sites_in_layers([2, 3], direction=gb.direction, tol=1)
+    gb.grain_b.fix_sites_in_layers([2, 3], direction=gb.direction, tol=1)
+    structure = Grain.stack_grains(gb.grain_a, gb.grain_b, direction=gb.direction)
+    structure.to(filename="POSCAR")
+
+We can see that ``Selective dynamics`` has been added in the ``POSCAR`` file.
