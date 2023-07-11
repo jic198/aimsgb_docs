@@ -33,3 +33,6 @@ You can change the tolerance factor by giving a ``tol`` argument::
 
 We can see that there are 6 layers in each grain. 
 
+.. image:: images/SrTiO3_fig2.png
+    :width: 400px
+
