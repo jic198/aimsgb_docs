@@ -7,5 +7,6 @@ GUI example
 
     BCC_Fe
     FCC_Ni
+    SrTiO3
 
 More to come.
