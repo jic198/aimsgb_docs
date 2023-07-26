@@ -4,7 +4,7 @@ Find Grain Boundaries
 
 In this example, I will show you how to print out available Σ, rotation angles, grain boundary (GB) planes, and coincident site lattice (CSL) matrices from a 
 given rotation axis. The purpose of this method is to provide you the grain boundary information. For example, if you are not sure what the GB plane is for a 
-GB you want to generate, you can find this information in :class:`GBInformation`. Let's say you want to create a Σ3[110] GB, but you are not sure what the available 
+GB you want to generate, you can find this information in :class:`GBInformation`, which is a :class:`dict` object. Let's say you want to create a Σ3[110] GB, but you are not sure what the available 
 GB planes are. To find this information
 
 .. code-block:: python
