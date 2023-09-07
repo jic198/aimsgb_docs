@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SrTiO3 &mdash; aimsgb 0.1.2 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Find Grain Boundaries" href="Find_GB.html" />
+    <link rel="prev" title="Graphene" href="Graphene.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            aimsgb
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html#how-to-cite-aimsgb">How to cite aimsgb</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Sections</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../gui/index.html">GUI example</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Python examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="BCC_Fe.html">BCC Fe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="FCC_Ni.html">FCC Ni</a></li>
+<li class="toctree-l2"><a class="reference internal" href="MoS2.html">MoS2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Graphene.html">Graphene</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">SrTiO3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Find_GB.html">Find Grain Boundaries</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">aimsgb</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Python examples</a></li>
+      <li class="breadcrumb-item active">SrTiO3</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/python/SrTiO3.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="srtio3">
+<h1>SrTiO3<a class="headerlink" href="#srtio3" title="Permalink to this heading"></a></h1>
+<p>Let’s take SrTiO3 Σ3[110]/(1-12) tilt grain boundary as an example. The initial structure is a <a class="reference external" href="https://next-gen.materialsproject.org/materials/mp-5229?formula=SrTiO3">cubic structure</a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">aimsgb</span> <span class="kn">import</span> <span class="n">GrainBoundary</span><span class="p">,</span> <span class="n">Grain</span>
+
+<span class="n">s_input</span> <span class="o">=</span> <span class="n">Grain</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="s2">&quot;POSCAR_SrTiO3&quot;</span><span class="p">)</span>
+<span class="n">gb</span> <span class="o">=</span> <span class="n">GrainBoundary</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="mi">3</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">s_input</span><span class="p">)</span>
+<span class="n">structure</span> <span class="o">=</span> <span class="n">Grain</span><span class="o">.</span><span class="n">stack_grains</span><span class="p">(</span><span class="n">gb</span><span class="o">.</span><span class="n">grain_a</span><span class="p">,</span> <span class="n">gb</span><span class="o">.</span><span class="n">grain_b</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="n">gb</span><span class="o">.</span><span class="n">direction</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../_images/SrTiO3_fig11.png"><img alt="../_images/SrTiO3_fig11.png" src="../_images/SrTiO3_fig11.png" style="width: 400px;" /></a>
+<p><code class="docutils literal notranslate"><span class="pre">s_input</span></code> can also be created using <code class="docutils literal notranslate"><span class="pre">from_mp_id</span></code> method by giving an <code class="docutils literal notranslate"><span class="pre">mp_id</span></code> from <a class="reference external" href="https://materialsproject.org/">Materials Project</a>.
+The <code class="docutils literal notranslate"><span class="pre">mp_id</span></code> of a cubic SrTiO3 is <cite>mp-5229</cite>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">s_input</span> <span class="o">=</span> <span class="n">Grain</span><span class="o">.</span><span class="n">from_mp_id</span><span class="p">(</span><span class="s2">&quot;mp-5229&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In VASP calculations of interface models, we often want to fix some layers in the bulk. <code class="docutils literal notranslate"><span class="pre">aimsgb</span></code> provides a method to fix some layers in each grain.
+First, let’s check the number of layers in each grain:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">layers</span> <span class="o">=</span> <span class="n">gb</span><span class="o">.</span><span class="n">grain_a</span><span class="o">.</span><span class="n">sort_sites_in_layers</span><span class="p">(</span><span class="n">direction</span><span class="o">=</span><span class="n">gb</span><span class="o">.</span><span class="n">direction</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">layers</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>We can see that there are 12 layers in each grain. Please note that the default tolerance factor to determnine if sites are in the same layer is 0.25 Angstrom.
+You can change the tolerance factor by giving a <code class="docutils literal notranslate"><span class="pre">tol</span></code> argument:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">layers</span> <span class="o">=</span> <span class="n">gb</span><span class="o">.</span><span class="n">grain_a</span><span class="o">.</span><span class="n">sort_sites_in_layers</span><span class="p">(</span><span class="n">direction</span><span class="o">=</span><span class="n">gb</span><span class="o">.</span><span class="n">direction</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">layers</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>We can see that there are 6 layers in each grain.</p>
+<a class="reference internal image-reference" href="../_images/SrTiO3_fig21.png"><img alt="../_images/SrTiO3_fig21.png" src="../_images/SrTiO3_fig21.png" style="width: 400px;" /></a>
+<p>Next, let’s fix layer 2 and 3 in each grain:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gb</span><span class="o">.</span><span class="n">grain_a</span><span class="o">.</span><span class="n">fix_sites_in_layers</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">direction</span><span class="o">=</span><span class="n">gb</span><span class="o">.</span><span class="n">direction</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">gb</span><span class="o">.</span><span class="n">grain_b</span><span class="o">.</span><span class="n">fix_sites_in_layers</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">direction</span><span class="o">=</span><span class="n">gb</span><span class="o">.</span><span class="n">direction</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">structure</span> <span class="o">=</span> <span class="n">Grain</span><span class="o">.</span><span class="n">stack_grains</span><span class="p">(</span><span class="n">gb</span><span class="o">.</span><span class="n">grain_a</span><span class="p">,</span> <span class="n">gb</span><span class="o">.</span><span class="n">grain_b</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="n">gb</span><span class="o">.</span><span class="n">direction</span><span class="p">)</span>
+<span class="n">structure</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s2">&quot;POSCAR&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We can see that <code class="docutils literal notranslate"><span class="pre">Selective</span> <span class="pre">dynamics</span></code> has been added in the <code class="docutils literal notranslate"><span class="pre">POSCAR</span></code> file.</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Graphene.html" class="btn btn-neutral float-left" title="Graphene" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Find_GB.html" class="btn btn-neutral float-right" title="Find Grain Boundaries" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Jianli Cheng.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

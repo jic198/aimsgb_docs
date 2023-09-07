@@ -6,6 +6,7 @@
   <title>aimsgb.agb &mdash; aimsgb 0.1.2 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
@@ -13,6 +14,8 @@
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/doctools.js"></script>
         <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/clipboard.min.js"></script>
+        <script src="../../_static/copybutton.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -120,8 +123,9 @@
     
     <span class="n">gb</span> <span class="o">=</span> <span class="n">GrainBoundary</span><span class="p">(</span><span class="n">axis</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">sigma</span><span class="p">,</span> <span class="n">plane</span><span class="p">,</span> <span class="n">initial_struct</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">uc_a</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">uc_b</span><span class="p">)</span>
     <span class="n">to_primitive</span> <span class="o">=</span> <span class="kc">False</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">conventional</span> <span class="k">else</span> <span class="kc">True</span>
-    <span class="n">gb</span><span class="o">.</span><span class="n">build_gb</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">vacuum</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">add_if_dist</span><span class="p">,</span> <span class="n">to_primitive</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">delete_layer</span><span class="p">,</span>
-                <span class="n">args</span><span class="o">.</span><span class="n">tol</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">out</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">fmt</span><span class="p">)</span>
+    <span class="n">structure</span> <span class="o">=</span> <span class="n">Grain</span><span class="o">.</span><span class="n">stack_grains</span><span class="p">(</span><span class="n">gb</span><span class="o">.</span><span class="n">grain_a</span><span class="p">,</span> <span class="n">gb</span><span class="o">.</span><span class="n">grain_b</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="n">gb</span><span class="o">.</span><span class="n">direction</span><span class="p">,</span>
+                                  <span class="n">to_primitive</span><span class="o">=</span><span class="n">to_primitive</span><span class="p">)</span>
+    <span class="n">structure</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">out</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">fmt</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;CSL Matrix (det=</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">gb</span><span class="o">.</span><span class="n">csl</span><span class="p">)</span><span class="si">}</span><span class="s2">):</span><span class="se">\n</span><span class="si">{</span><span class="n">gb</span><span class="o">.</span><span class="n">csl</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">out</span><span class="si">}</span><span class="s2"> of sigma</span><span class="si">{</span><span class="n">gb</span><span class="o">.</span><span class="n">sigma</span><span class="si">}</span><span class="s2">[</span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">axis</span><span class="si">}</span><span class="s2">]/(</span><span class="si">{</span><span class="n">gb</span><span class="o">.</span><span class="n">plane_str</span><span class="si">}</span><span class="s2">) is created&quot;</span><span class="p">)</span></div>
 

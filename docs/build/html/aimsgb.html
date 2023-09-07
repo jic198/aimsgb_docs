@@ -7,6 +7,7 @@
   <title>aimsgb package &mdash; aimsgb 0.1.2 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
@@ -14,6 +15,8 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/clipboard.min.js"></script>
+        <script src="_static/copybutton.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" /> 
@@ -100,45 +103,61 @@
 <span id="aimsgb-grain-module"></span><h2>aimsgb.grain module<a class="headerlink" href="#module-aimsgb.grain" title="Permalink to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="aimsgb.grain.Grain">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aimsgb.grain.</span></span><span class="sig-name descname"><span class="pre">Grain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lattice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">species</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">charge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validate_proximity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_unit_cell</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords_are_cartesian</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">site_properties</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aimsgb/grain.html#Grain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aimsgb.grain.Grain" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aimsgb.grain.</span></span><span class="sig-name descname"><span class="pre">Grain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lattice</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ArrayLike</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Lattice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">species</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">CompositionLike</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">ArrayLike</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">charge</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validate_proximity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_unit_cell</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords_are_cartesian</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">site_properties</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aimsgb/grain.html#Grain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aimsgb.grain.Grain" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></p>
 <p>We use the Structure class from pymatgen and add several new functions.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="aimsgb.grain.Grain.build_grains">
-<span class="sig-name descname"><span class="pre">build_grains</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">csl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gb_direction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uc_a</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uc_b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aimsgb/grain.html#Grain.build_grains"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aimsgb.grain.Grain.build_grains" title="Permalink to this definition"></a></dt>
-<dd><p>Build structures for grain A and B from CSL matrix, number of unit cell
-of grain A and number of unit cell of grain B. Each grain is essentially
-a supercell for the initial structure.</p>
+<span class="sig-name descname"><span class="pre">build_grains</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">csl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uc_a</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uc_b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aimsgb/grain.html#Grain.build_grains"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aimsgb.grain.Grain.build_grains" title="Permalink to this definition"></a></dt>
+<dd><p>Build structures for grain A and B from the coincidnet site lattice (CSL) matrix,
+number of unit cell of grain A and number of unit cell of grain B. Each grain
+is essentially a supercell of the initial structure.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>csl</strong> (<em>3x3 matrix</em>) – CSL matrix (scaling matrix)</p></li>
-<li><p><strong>gb_direction</strong> (<em>int</em>) – The direction of GB. 0: x, 1: y, 2: z</p></li>
+<li><p><strong>direction</strong> (<em>int</em>) – Stacking direction of GB. 0: a, 1: b, 2: c</p></li>
 <li><p><strong>uc_a</strong> (<em>int</em>) – Number of unit cell of grain A. Default to 1.</p></li>
 <li><p><strong>uc_b</strong> (<em>int</em>) – Number of unit cell of grain B. Default to 1.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Grain objects for grain A and B</p>
+<dd class="field-even"><p>Grain objects for grain A and B, and CSL matrix. The CSL matrix
+may be different from the input CSL matrix if the lattice system
+of the grain is not orthogonal.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="aimsgb.grain.Grain.delete_bt_layer">
-<span class="sig-name descname"><span class="pre">delete_bt_layer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aimsgb/grain.html#Grain.delete_bt_layer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aimsgb.grain.Grain.delete_bt_layer" title="Permalink to this definition"></a></dt>
-<dd><p>Delete bottom or top layer of the structure.
-:param bt: Specify whether it’s a top or bottom layer delete. “b”</p>
-<blockquote>
-<div><p>means bottom layer and “t” means top layer.</p>
-</div></blockquote>
+<span class="sig-name descname"><span class="pre">delete_bt_layer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aimsgb/grain.html#Grain.delete_bt_layer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aimsgb.grain.Grain.delete_bt_layer" title="Permalink to this definition"></a></dt>
+<dd><p>Delete bottom or top layer of the structure.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>tol</strong> (<em>float</em>) – Tolerance factor to determine whether two
-atoms are at the same plane.
-Default to 0.25</p></li>
-<li><p><strong>axis</strong> (<em>int</em>) – The direction of top and bottom layers. 0: x, 1: y, 2: z</p></li>
+<li><p><strong>bt</strong> (<em>str</em>) – Specify whether it’s a top or bottom layer delete. “b”
+means bottom layer and “t” means top layer.</p></li>
+<li><p><strong>tol</strong> (<em>float</em>) – Tolerance factor in Angstrom to determnine if sites are
+in the same layer. Default to 0.25.</p></li>
+<li><p><strong>direction</strong> (<em>int</em>) – Direction to sort the sites by layers. 0: a, 1: b, 2: c</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aimsgb.grain.Grain.fix_sites_in_layers">
+<span class="sig-name descname"><span class="pre">fix_sites_in_layers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layer_indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aimsgb/grain.html#Grain.fix_sites_in_layers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aimsgb.grain.Grain.fix_sites_in_layers" title="Permalink to this definition"></a></dt>
+<dd><p>Fix sites in certain layers. The layer by layer direction is given by direction.
+This function is useful for selective dynamics calculations in VASP.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>layer_indices</strong> (<em>list</em>) – A list of layer indices.</p></li>
+<li><p><strong>tol</strong> (<em>float</em>) – Tolerance factor in Angstrom to determnine if sites are
+in the same layer. Default to 0.25.</p></li>
+<li><p><strong>direction</strong> (<em>int</em>) – Direction to sort the sites by layers. 0: a, 1: b, 2: c</p></li>
 </ul>
 </dd>
 </dl>
@@ -147,12 +166,13 @@ Default to 0.25</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="aimsgb.grain.Grain.from_mp_id">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_mp_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mp_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aimsgb/grain.html#Grain.from_mp_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aimsgb.grain.Grain.from_mp_id" title="Permalink to this definition"></a></dt>
-<dd><p>Get a structure from Materials Project database.
-:param mp_id: Materials Project ID.
-:type mp_id: str</p>
+<dd><p>Get a structure from Materials Project database.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>A structure object.</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>mp_id</strong> (<em>str</em>) – Materials Project ID.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A structure object.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -160,7 +180,11 @@ Default to 0.25</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="aimsgb.grain.Grain.get_b_from_a">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_b_from_a</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grain_a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">csl</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aimsgb/grain.html#Grain.get_b_from_a"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aimsgb.grain.Grain.get_b_from_a" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Generate grain_b structure from a grain_a structure by rotating the sites in
+grain_a by 180 degree. The rotation axis could be either the 1st or the 2nd
+column of the CSL matrix. Here, I use a vector with a shorter length  as the rotation
+axis, as it yields a smaller grain boundary structure.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="aimsgb.grain.Grain.make_supercell">
@@ -177,23 +201,23 @@ to 1 will become 0 and the lattice are redefined so that x_c = [0, 0, c]</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="aimsgb.grain.Grain.set_orthogonal_grain">
-<span class="sig-name descname"><span class="pre">set_orthogonal_grain</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aimsgb/grain.html#Grain.set_orthogonal_grain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aimsgb.grain.Grain.set_orthogonal_grain" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">set_orthogonal_grain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aimsgb/grain.html#Grain.set_orthogonal_grain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aimsgb.grain.Grain.set_orthogonal_grain" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="aimsgb.grain.Grain.sort_sites_in_layers">
-<span class="sig-name descname"><span class="pre">sort_sites_in_layers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aimsgb/grain.html#Grain.sort_sites_in_layers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aimsgb.grain.Grain.sort_sites_in_layers" title="Permalink to this definition"></a></dt>
-<dd><p>Sort the sites in a structure layer by layer.</p>
+<span class="sig-name descname"><span class="pre">sort_sites_in_layers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aimsgb/grain.html#Grain.sort_sites_in_layers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aimsgb.grain.Grain.sort_sites_in_layers" title="Permalink to this definition"></a></dt>
+<dd><p>Sort the sites in a structure by layers.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>tol</strong> (<em>float</em>) – tolerance factor when determine whether two atoms are
-are at the same plane. Angstrom</p></li>
-<li><p><strong>axis</strong> (<em>int</em>) – The direction of top and bottom layers. 0: x, 1: y, 2: z</p></li>
+<li><p><strong>tol</strong> (<em>float</em>) – Tolerance factor in Angstrom to determnine if sites are
+in the same layer. Default to 0.25.</p></li>
+<li><p><strong>direction</strong> (<em>int</em>) – Direction to sort the sites by layers. 0: a, 1: b, 2: c</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Lists with the sites in the same plane as one list.</p>
+<dd class="field-even"><p>Lists with a list of (site, index) in the same plane as one list.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -203,30 +227,23 @@ are at the same plane. Angstrom</p></li>
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">stack_grains</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grain_a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grain_b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vacuum</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delete_layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'0b0t0b0t'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_primitive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aimsgb/grain.html#Grain.stack_grains"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aimsgb.grain.Grain.stack_grains" title="Permalink to this definition"></a></dt>
 <dd><p>Build an interface structure by stacking two grains along a given direction.
 The grain_b a- and b-vectors will be forced to be the grain_a’s
-a- and b-vectors.
-:param grain_a: Substrate for the interface structure
-:type grain_a: Grain
-:param grain_b: Film for the interface structure
-:type grain_b: Grain
-:param vacuum: Vacuum space above the film in Angstroms. Default to 0.0
-:type vacuum: float
-:param gap: Gap between substrate and film in Angstroms. Default to 0.0
-:type gap: float
-:param direction: Stacking direction of the interface structure. 0: x, 1: y, 2: z.
-:type direction: int
-:param delete_layer: Delete top and bottom layers of the substrate and film.</p>
-<blockquote>
-<div><p>8 characters in total. The first 4 characters is for the substrate and
-the other 4 is for the film. “b” means bottom layer and “t” means
-top layer. Integer represents the number of layers to be deleted.
-Default to “0b0t0b0t”, which means no deletion of layers. The
-direction of top and bottom layers is based on the given direction.</p>
-</div></blockquote>
+a- and b-vectors.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>tol</strong> (<em>float</em>) – Tolerance factor in Angstroms to determine whether two
-atoms are at the same plane. Default to 0.25</p></li>
+<li><p><strong>grain_a</strong> (<a class="reference internal" href="#aimsgb.grain.Grain" title="aimsgb.grain.Grain"><em>Grain</em></a>) – Substrate for the interface structure</p></li>
+<li><p><strong>grain_b</strong> (<a class="reference internal" href="#aimsgb.grain.Grain" title="aimsgb.grain.Grain"><em>Grain</em></a>) – Film for the interface structure</p></li>
+<li><p><strong>vacuum</strong> (<em>float</em>) – Vacuum space above the film in Angstroms. Default to 0.0</p></li>
+<li><p><strong>gap</strong> (<em>float</em>) – Gap between substrate and film in Angstroms. Default to 0.0</p></li>
+<li><p><strong>direction</strong> (<em>int</em>) – Stacking direction of the interface structure. 0: a, 1: b, 2: c.</p></li>
+<li><p><strong>delete_layer</strong> (<em>str</em>) – Delete top and bottom layers of the substrate and film.
+8 characters in total. The first 4 characters is for the substrate and
+the other 4 is for the film. “b” means bottom layer and “t” means
+top layer. Integer represents the number of layers to be deleted.
+Default to “0b0t0b0t”, which means no deletion of layers. The
+direction of top and bottom layers is based on the given direction.</p></li>
+<li><p><strong>tol</strong> (<em>float</em>) – Tolerance factor in Angstrom to determnine if sites are
+in the same layer. Default to 0.25.</p></li>
 <li><p><strong>to_primitive</strong> (<em>bool</em>) – Whether to get primitive structure of GB. Default to true.</p></li>
 </ul>
 </dd>
@@ -353,7 +370,7 @@ Default to true.</p></li>
 the other 4 is for grain B. “b” means bottom layer and “t” means
 top layer. Integer represents the number of layers to be deleted.
 Default to “0b0t0b0t”, which means no deletion of layers. The
-direction of top and bottom layers is based on gb_direction.</p></li>
+direction of top and bottom layers is based on direction.</p></li>
 <li><p><strong>tol</strong> (<em>float</em>) – Tolerance factor to determine whether two
 atoms are at the same plane.
 Default to 0.25</p></li>
@@ -363,12 +380,6 @@ Default to 0.25</p></li>
 <dd class="field-even"><p>GB structure (Grain)</p>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="aimsgb.grain_bound.GrainBoundary.csl">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">csl</span></span><a class="headerlink" href="#aimsgb.grain_bound.GrainBoundary.csl" title="Permalink to this definition"></a></dt>
-<dd><p>CSL matrix</p>
 </dd></dl>
 
 <dl class="py property">

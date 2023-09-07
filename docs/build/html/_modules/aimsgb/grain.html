@@ -6,6 +6,7 @@
   <title>aimsgb.grain &mdash; aimsgb 0.1.2 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
@@ -13,6 +14,8 @@
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/doctools.js"></script>
         <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/clipboard.min.js"></script>
+        <script src="../../_static/copybutton.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -73,11 +76,12 @@
            <div itemprop="articleBody">
              
   <h1>Source code for aimsgb.grain</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">re</span>
+<span></span><span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">sin</span><span class="p">,</span> <span class="n">radians</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">reduce</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">reduce</span><span class="p">,</span> <span class="n">wraps</span>
 <span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">groupby</span>
 <span class="kn">from</span> <span class="nn">aimsgb.utils</span> <span class="kn">import</span> <span class="n">reduce_vector</span>
 <span class="kn">from</span> <span class="nn">pymatgen.core.structure</span> <span class="kn">import</span> <span class="n">Structure</span><span class="p">,</span> <span class="n">Lattice</span><span class="p">,</span> <span class="n">PeriodicSite</span>
@@ -96,26 +100,25 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    We use the Structure class from pymatgen and add several new functions.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lattice</span><span class="p">,</span> <span class="n">species</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">charge</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">validate_proximity</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">to_unit_cell</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                 <span class="n">coords_are_cartesian</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">site_properties</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-
-        <span class="nb">super</span><span class="p">(</span><span class="n">Structure</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">lattice</span><span class="p">,</span> <span class="n">species</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">charge</span><span class="o">=</span><span class="n">charge</span><span class="p">,</span>
-                                        <span class="n">validate_proximity</span><span class="o">=</span><span class="n">validate_proximity</span><span class="p">,</span>
-                                        <span class="n">to_unit_cell</span><span class="o">=</span><span class="n">to_unit_cell</span><span class="p">,</span>
-                                        <span class="n">coords_are_cartesian</span><span class="o">=</span><span class="n">coords_are_cartesian</span><span class="p">,</span>
-                                        <span class="n">site_properties</span><span class="o">=</span><span class="n">site_properties</span><span class="p">)</span>
-
+    <span class="nd">@wraps</span><span class="p">(</span><span class="n">Structure</span><span class="o">.</span><span class="fm">__init__</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Structure</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sites</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sites</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Grain.get_b_from_a"><a class="viewcode-back" href="../../aimsgb.html#aimsgb.grain.Grain.get_b_from_a">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">get_b_from_a</span><span class="p">(</span><span class="n">grain_a</span><span class="p">,</span> <span class="n">csl</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate grain_b structure from a grain_a structure by rotating the sites in </span>
+<span class="sd">        grain_a by 180 degree. The rotation axis could be either the 1st or the 2nd </span>
+<span class="sd">        column of the CSL matrix. Here, I use a vector with a shorter length  as the rotation </span>
+<span class="sd">        axis, as it yields a smaller grain boundary structure.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">grain_b</span> <span class="o">=</span> <span class="n">grain_a</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">csl_t</span> <span class="o">=</span> <span class="n">csl</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
         <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">csl_t</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">-</span> <span class="nb">abs</span><span class="p">(</span><span class="n">csl_t</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">axis</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
             <span class="n">axis</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">axis</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="n">anchor</span> <span class="o">=</span> <span class="n">grain_b</span><span class="o">.</span><span class="n">lattice</span><span class="o">.</span><span class="n">get_cartesian_coords</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">.0</span><span class="p">,</span> <span class="mf">.0</span><span class="p">,</span> <span class="mf">.0</span><span class="p">]))</span>
         <span class="c1"># print(axis, anchor)</span>
         <span class="c1"># exit()</span>
@@ -126,6 +129,7 @@
     <span class="k">def</span> <span class="nf">from_mp_id</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">mp_id</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get a structure from Materials Project database.</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            mp_id (str): Materials Project ID.</span>
 
@@ -137,6 +141,27 @@
         <span class="n">mpr</span> <span class="o">=</span> <span class="n">MPRester</span><span class="p">()</span>
         <span class="n">s</span> <span class="o">=</span> <span class="n">mpr</span><span class="o">.</span><span class="n">get_structure_by_material_id</span><span class="p">(</span><span class="n">mp_id</span><span class="p">,</span> <span class="n">conventional_unit_cell</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">as_dict</span><span class="p">())</span></div>
+    
+<div class="viewcode-block" id="Grain.fix_sites_in_layers"><a class="viewcode-back" href="../../aimsgb.html#aimsgb.grain.Grain.fix_sites_in_layers">[docs]</a>    <span class="k">def</span> <span class="nf">fix_sites_in_layers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer_indices</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fix sites in certain layers. The layer by layer direction is given by direction.</span>
+<span class="sd">        This function is useful for selective dynamics calculations in VASP.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            layer_indices (list): A list of layer indices.</span>
+<span class="sd">            tol (float): Tolerance factor in Angstrom to determnine if sites are </span>
+<span class="sd">                in the same layer. Default to 0.25.</span>
+<span class="sd">            direction (int): Direction to sort the sites by layers. 0: a, 1: b, 2: c</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">layers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sort_sites_in_layers</span><span class="p">(</span><span class="n">tol</span><span class="o">=</span><span class="n">tol</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="n">direction</span><span class="p">)</span>
+        <span class="n">sd_sites</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">layers</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">layer_indices</span><span class="p">:</span>
+                <span class="n">sd_sites</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">zip</span><span class="p">([[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">]]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">),</span> <span class="p">[</span><span class="n">_i</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">_i</span> <span class="ow">in</span> <span class="n">l</span><span class="p">]))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">sd_sites</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">zip</span><span class="p">([[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">]]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">),</span> <span class="p">[</span><span class="n">_i</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">_i</span> <span class="ow">in</span> <span class="n">l</span><span class="p">]))</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">sd_sites</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_site_property</span><span class="p">(</span><span class="s2">&quot;selective_dynamics&quot;</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Grain.make_supercell"><a class="viewcode-back" href="../../aimsgb.html#aimsgb.grain.Grain.make_supercell">[docs]</a>    <span class="k">def</span> <span class="nf">make_supercell</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scaling_matrix</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -162,28 +187,27 @@
         <span class="n">new_lat</span> <span class="o">=</span> <span class="n">Lattice</span><span class="o">.</span><span class="n">from_parameters</span><span class="p">(</span><span class="o">*</span><span class="n">s</span><span class="o">.</span><span class="n">lattice</span><span class="o">.</span><span class="n">parameters</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lattice</span> <span class="o">=</span> <span class="n">new_lat</span></div>
 
-<div class="viewcode-block" id="Grain.delete_bt_layer"><a class="viewcode-back" href="../../aimsgb.html#aimsgb.grain.Grain.delete_bt_layer">[docs]</a>    <span class="k">def</span> <span class="nf">delete_bt_layer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bt</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+<div class="viewcode-block" id="Grain.delete_bt_layer"><a class="viewcode-back" href="../../aimsgb.html#aimsgb.grain.Grain.delete_bt_layer">[docs]</a>    <span class="k">def</span> <span class="nf">delete_bt_layer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bt</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Delete bottom or top layer of the structure.</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            bt (str): Specify whether it&#39;s a top or bottom layer delete. &quot;b&quot;</span>
 <span class="sd">                means bottom layer and &quot;t&quot; means top layer.</span>
-<span class="sd">            tol (float), Angstrom: Tolerance factor to determine whether two</span>
-<span class="sd">                atoms are at the same plane.</span>
-<span class="sd">                Default to 0.25</span>
-<span class="sd">            axis (int): The direction of top and bottom layers. 0: x, 1: y, 2: z</span>
-
+<span class="sd">            tol (float): Tolerance factor in Angstrom to determnine if sites are </span>
+<span class="sd">                in the same layer. Default to 0.25.</span>
+<span class="sd">            direction (int): Direction to sort the sites by layers. 0: a, 1: b, 2: c</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">bt</span> <span class="o">==</span> <span class="s2">&quot;t&quot;</span><span class="p">:</span>
             <span class="n">l1</span><span class="p">,</span> <span class="n">l2</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">l1</span><span class="p">,</span> <span class="n">l2</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
-        <span class="n">l</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lattice</span><span class="o">.</span><span class="n">abc</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span>
-        <span class="n">layers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sort_sites_in_layers</span><span class="p">(</span><span class="n">tol</span><span class="o">=</span><span class="n">tol</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
-        <span class="n">l_dist</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">layers</span><span class="p">[</span><span class="n">l1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span> <span class="o">-</span> <span class="n">layers</span><span class="p">[</span><span class="n">l2</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">axis</span><span class="p">])</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lattice</span><span class="o">.</span><span class="n">abc</span><span class="p">[</span><span class="n">direction</span><span class="p">]</span>
+        <span class="n">layers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sort_sites_in_layers</span><span class="p">(</span><span class="n">tol</span><span class="o">=</span><span class="n">tol</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="n">direction</span><span class="p">)</span>
+        <span class="n">l_dist</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">layers</span><span class="p">[</span><span class="n">l1</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">direction</span><span class="p">]</span> <span class="o">-</span> <span class="n">layers</span><span class="p">[</span><span class="n">l2</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">direction</span><span class="p">])</span>
         <span class="n">l_vector</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
-        <span class="n">l_vector</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">axis</span><span class="p">,</span> <span class="p">(</span><span class="n">l</span> <span class="o">-</span> <span class="n">l_dist</span><span class="p">)</span> <span class="o">/</span> <span class="n">l</span><span class="p">)</span>
+        <span class="n">l_vector</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">direction</span><span class="p">,</span> <span class="p">(</span><span class="n">l</span> <span class="o">-</span> <span class="n">l_dist</span><span class="p">)</span> <span class="o">/</span> <span class="n">l</span><span class="p">)</span>
         <span class="n">new_lat</span> <span class="o">=</span> <span class="n">Lattice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lattice</span><span class="o">.</span><span class="n">matrix</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">l_vector</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">])</span>
 
         <span class="n">layers</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">l1</span><span class="p">)</span>
@@ -191,28 +215,29 @@
         <span class="n">new_sites</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">l_dist</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">bt</span> <span class="o">==</span> <span class="s2">&quot;t&quot;</span> <span class="k">else</span> <span class="n">l_dist</span>
         <span class="n">l_vector</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
-        <span class="n">l_vector</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">axis</span><span class="p">,</span> <span class="n">l_dist</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">sites</span><span class="p">:</span>
-            <span class="n">new_sites</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">PeriodicSite</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">specie</span><span class="p">,</span> <span class="n">i</span><span class="o">.</span><span class="n">coords</span> <span class="o">-</span> <span class="n">l_vector</span><span class="p">,</span>
+        <span class="n">l_vector</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">direction</span><span class="p">,</span> <span class="n">l_dist</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">site</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">sites</span><span class="p">:</span>
+            <span class="n">new_sites</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">PeriodicSite</span><span class="p">(</span><span class="n">site</span><span class="o">.</span><span class="n">specie</span><span class="p">,</span> <span class="n">site</span><span class="o">.</span><span class="n">coords</span> <span class="o">-</span> <span class="n">l_vector</span><span class="p">,</span>
                                           <span class="n">new_lat</span><span class="p">,</span> <span class="n">coords_are_cartesian</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sites</span> <span class="o">=</span> <span class="n">new_sites</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_lattice</span> <span class="o">=</span> <span class="n">new_lat</span></div>
 
-<div class="viewcode-block" id="Grain.sort_sites_in_layers"><a class="viewcode-back" href="../../aimsgb.html#aimsgb.grain.Grain.sort_sites_in_layers">[docs]</a>    <span class="k">def</span> <span class="nf">sort_sites_in_layers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+<div class="viewcode-block" id="Grain.sort_sites_in_layers"><a class="viewcode-back" href="../../aimsgb.html#aimsgb.grain.Grain.sort_sites_in_layers">[docs]</a>    <span class="k">def</span> <span class="nf">sort_sites_in_layers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Sort the sites in a structure layer by layer.</span>
+<span class="sd">        Sort the sites in a structure by layers.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            tol (float): tolerance factor when determine whether two atoms are</span>
-<span class="sd">                are at the same plane. Angstrom</span>
-<span class="sd">            axis (int): The direction of top and bottom layers. 0: x, 1: y, 2: z</span>
+<span class="sd">            tol (float): Tolerance factor in Angstrom to determnine if sites are </span>
+<span class="sd">                in the same layer. Default to 0.25.</span>
+<span class="sd">            direction (int): Direction to sort the sites by layers. 0: a, 1: b, 2: c</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            Lists with the sites in the same plane as one list.</span>
+<span class="sd">            Lists with a list of (site, index) in the same plane as one list.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">new_atoms</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">frac_coords</span><span class="p">[</span><span class="n">axis</span><span class="p">])</span>
+        <span class="n">sites_indices</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sites</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">))),</span> 
+                               <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">frac_coords</span><span class="p">[</span><span class="n">direction</span><span class="p">])</span>
         <span class="n">layers</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">groupby</span><span class="p">(</span><span class="n">new_atoms</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">frac_coords</span><span class="p">[</span><span class="n">axis</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">groupby</span><span class="p">(</span><span class="n">sites_indices</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">frac_coords</span><span class="p">[</span><span class="n">direction</span><span class="p">]):</span>
             <span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">g</span><span class="p">))</span>
         <span class="n">new_layers</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">k</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
@@ -220,9 +245,9 @@
             <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="n">k</span><span class="p">:</span>
                 <span class="n">tmp</span> <span class="o">=</span> <span class="n">layers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
                 <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">layers</span><span class="p">)):</span>
-                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lattice</span><span class="o">.</span><span class="n">abc</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span> <span class="o">*</span> <span class="nb">abs</span><span class="p">(</span>
-                                    <span class="n">layers</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">frac_coords</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span> <span class="o">-</span>
-                                    <span class="n">layers</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">frac_coords</span><span class="p">[</span><span class="n">axis</span><span class="p">])</span> <span class="o">&lt;</span> <span class="n">tol</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lattice</span><span class="o">.</span><span class="n">abc</span><span class="p">[</span><span class="n">direction</span><span class="p">]</span> <span class="o">*</span> <span class="nb">abs</span><span class="p">(</span>
+                                    <span class="n">layers</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">frac_coords</span><span class="p">[</span><span class="n">direction</span><span class="p">]</span> <span class="o">-</span>
+                                    <span class="n">layers</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">frac_coords</span><span class="p">[</span><span class="n">direction</span><span class="p">])</span> <span class="o">&lt;</span> <span class="n">tol</span><span class="p">:</span>
                         <span class="n">tmp</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">layers</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
                         <span class="n">k</span> <span class="o">=</span> <span class="n">j</span>
                     <span class="k">else</span><span class="p">:</span>
@@ -230,38 +255,58 @@
                 <span class="n">new_layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">tmp</span><span class="p">))</span>
         <span class="c1"># check if the 1st layer and last layer are actually the same layer</span>
         <span class="c1"># use the fractional as cartesian doesn&#39;t work for unorthonormal</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lattice</span><span class="o">.</span><span class="n">abc</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span> <span class="o">*</span> <span class="nb">abs</span><span class="p">(</span>
-                                <span class="n">new_layers</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">frac_coords</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">-</span>
-                                <span class="n">new_layers</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">frac_coords</span><span class="p">[</span><span class="n">axis</span><span class="p">])</span> <span class="o">&lt;</span> <span class="n">tol</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lattice</span><span class="o">.</span><span class="n">abc</span><span class="p">[</span><span class="n">direction</span><span class="p">]</span> <span class="o">*</span> <span class="nb">abs</span><span class="p">(</span>
+                                <span class="n">new_layers</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">frac_coords</span><span class="p">[</span><span class="n">direction</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">-</span>
+                                <span class="n">new_layers</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">frac_coords</span><span class="p">[</span><span class="n">direction</span><span class="p">])</span> <span class="o">&lt;</span> <span class="n">tol</span><span class="p">:</span>
             <span class="n">tmp</span> <span class="o">=</span> <span class="n">new_layers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">new_layers</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
             <span class="n">new_layers</span> <span class="o">=</span> <span class="n">new_layers</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
             <span class="n">new_layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">tmp</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">new_layers</span></div>
 
-<div class="viewcode-block" id="Grain.set_orthogonal_grain"><a class="viewcode-back" href="../../aimsgb.html#aimsgb.grain.Grain.set_orthogonal_grain">[docs]</a>    <span class="k">def</span> <span class="nf">set_orthogonal_grain</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lattice</span><span class="o">.</span><span class="n">abc</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">lattice</span> <span class="o">=</span> <span class="n">Lattice</span><span class="o">.</span><span class="n">orthorhombic</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span></div>
+    <span class="c1"># def set_orthogonal_grain(self):</span>
+    <span class="c1">#     a, b, c = self.lattice.abc</span>
+    <span class="c1">#     self.lattice = Lattice.orthorhombic(a, b, c)</span>
 
-<div class="viewcode-block" id="Grain.build_grains"><a class="viewcode-back" href="../../aimsgb.html#aimsgb.grain.Grain.build_grains">[docs]</a>    <span class="k">def</span> <span class="nf">build_grains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">csl</span><span class="p">,</span> <span class="n">gb_direction</span><span class="p">,</span> <span class="n">uc_a</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">uc_b</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<div class="viewcode-block" id="Grain.set_orthogonal_grain"><a class="viewcode-back" href="../../aimsgb.html#aimsgb.grain.Grain.set_orthogonal_grain">[docs]</a>    <span class="k">def</span> <span class="nf">set_orthogonal_grain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+        <span class="n">abc</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lattice</span><span class="o">.</span><span class="n">matrix</span><span class="p">)</span>
+        <span class="n">_abc</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">abc</span><span class="p">)</span>
+        <span class="n">_abc</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">direction</span><span class="p">)</span>
+        <span class="n">new_c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="o">*</span><span class="n">_abc</span><span class="p">)</span>
+        <span class="n">new_c</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">new_c</span><span class="p">)</span>
+        <span class="n">new_c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">abc</span><span class="p">[</span><span class="n">direction</span><span class="p">],</span> <span class="n">new_c</span><span class="p">)</span> <span class="o">*</span> <span class="n">new_c</span>
+        <span class="n">_abc</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">direction</span><span class="p">,</span> <span class="n">new_c</span><span class="p">)</span>
+        <span class="n">new_latt</span> <span class="o">=</span> <span class="n">Lattice</span><span class="p">(</span><span class="n">_abc</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Grain</span><span class="p">(</span>
+            <span class="n">lattice</span><span class="o">=</span><span class="n">new_latt</span><span class="p">,</span> 
+            <span class="n">species</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">species_and_occu</span><span class="p">,</span> 
+            <span class="n">coords</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cart_coords</span><span class="p">,</span>
+            <span class="n">coords_are_cartesian</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">site_properties</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">site_properties</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Grain.build_grains"><a class="viewcode-back" href="../../aimsgb.html#aimsgb.grain.Grain.build_grains">[docs]</a>    <span class="k">def</span> <span class="nf">build_grains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">csl</span><span class="p">,</span> <span class="n">direction</span><span class="p">,</span> <span class="n">uc_a</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">uc_b</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Build structures for grain A and B from CSL matrix, number of unit cell</span>
-<span class="sd">        of grain A and number of unit cell of grain B. Each grain is essentially</span>
-<span class="sd">        a supercell for the initial structure.</span>
+<span class="sd">        Build structures for grain A and B from the coincidnet site lattice (CSL) matrix, </span>
+<span class="sd">        number of unit cell of grain A and number of unit cell of grain B. Each grain</span>
+<span class="sd">        is essentially a supercell of the initial structure.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            csl (3x3 matrix): CSL matrix (scaling matrix)</span>
-<span class="sd">            gb_direction (int): The direction of GB. 0: x, 1: y, 2: z</span>
+<span class="sd">            direction (int): Stacking direction of GB. 0: a, 1: b, 2: c</span>
 <span class="sd">            uc_a (int): Number of unit cell of grain A. Default to 1.</span>
 <span class="sd">            uc_b (int): Number of unit cell of grain B. Default to 1.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            Grain objects for grain A and B</span>
+<span class="sd">            Grain objects for grain A and B, and CSL matrix. The CSL matrix </span>
+<span class="sd">            may be different from the input CSL matrix if the lattice system </span>
+<span class="sd">            of the grain is not orthogonal.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">csl_t</span> <span class="o">=</span> <span class="n">csl</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
         <span class="c1"># rotate along a longer axis between a and b</span>
         <span class="n">grain_a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">grain_a</span><span class="o">.</span><span class="n">make_supercell</span><span class="p">(</span><span class="n">csl_t</span><span class="p">)</span>
-        <span class="c1"># grain_a.to(filename=&#39;POSCAR&#39;)</span>
+        <span class="c1"># grain_a.to(filename=&#39;POSCAR_a&#39;)</span>
         <span class="c1"># exit()</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">grain_a</span><span class="o">.</span><span class="n">lattice</span><span class="o">.</span><span class="n">is_orthogonal</span><span class="p">:</span>
@@ -272,37 +317,42 @@
                                                <span class="n">min_length</span><span class="o">=</span><span class="nb">min</span><span class="p">(</span><span class="n">grain_a</span><span class="o">.</span><span class="n">lattice</span><span class="o">.</span><span class="n">abc</span><span class="p">))</span>
             <span class="n">_s</span> <span class="o">=</span> <span class="n">grain_a</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
             <span class="n">_s</span> <span class="o">=</span> <span class="n">cst</span><span class="o">.</span><span class="n">apply_transformation</span><span class="p">(</span><span class="n">_s</span><span class="p">)</span>
-            <span class="n">_matrix</span> <span class="o">=</span> <span class="p">[</span><span class="n">reduce_vector</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">cst</span><span class="o">.</span><span class="n">transformation_matrix</span><span class="p">]</span>
+            <span class="n">_csl</span> <span class="o">=</span> <span class="p">[</span><span class="n">reduce_vector</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">cst</span><span class="o">.</span><span class="n">transformation_matrix</span><span class="p">]</span>
             <span class="n">_s</span> <span class="o">=</span> <span class="n">grain_a</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-            <span class="n">_s</span><span class="o">.</span><span class="n">make_supercell</span><span class="p">(</span><span class="n">_matrix</span><span class="p">)</span>
+            <span class="n">_s</span><span class="o">.</span><span class="n">make_supercell</span><span class="p">(</span><span class="n">_csl</span><span class="p">)</span>
             <span class="n">sm</span> <span class="o">=</span> <span class="n">StructureMatcher</span><span class="p">(</span><span class="n">attempt_supercell</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">primitive_cell</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-            <span class="n">_matrix</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">get_supercell_matrix</span><span class="p">(</span><span class="n">_s</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
-            <span class="n">matrix</span> <span class="o">=</span> <span class="p">[</span><span class="n">reduce_vector</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">_matrix</span><span class="p">]</span>
+            <span class="n">_csl</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">get_supercell_matrix</span><span class="p">(</span><span class="n">_s</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+            <span class="n">csl</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">reduce_vector</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">_csl</span><span class="p">])</span>
             <span class="n">grain_a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-            <span class="n">grain_a</span><span class="o">.</span><span class="n">make_supercell</span><span class="p">(</span><span class="n">matrix</span><span class="p">)</span>
+            <span class="n">grain_a</span><span class="o">.</span><span class="n">make_supercell</span><span class="p">(</span><span class="n">csl</span><span class="p">)</span>
+
             <span class="c1"># grain_a.make_supercell(get_sc_fromstruct(grain_a, min_length=min(grain_a.lattice.abc),</span>
-            <span class="c1">#                                          force_diagonal=True))</span>
+                                                    <span class="c1">#  force_diagonal=True))</span>
             <span class="c1"># grain_a.make_supercell(get_sc_fromstruct(grain_a).transpose())</span>
+
             <span class="c1"># grain_a.set_orthogonal_grain()</span>
             <span class="c1"># grain_b = grain_b.set_orthogonal_grain()</span>
+            <span class="c1"># grain_a = grain_a.set_orthogonal_grain(direction)</span>
 
-        <span class="c1"># grain_a.to(filename=&#39;POSCAR&#39;)</span>
+        <span class="c1"># grain_a.to(filename=&#39;POSCAR_a_1&#39;)</span>
         <span class="c1"># exit()</span>
         <span class="n">temp_a</span> <span class="o">=</span> <span class="n">grain_a</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">scale_vector</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
-        <span class="n">scale_vector</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">gb_direction</span><span class="p">,</span> <span class="n">uc_b</span><span class="p">)</span>
+        <span class="n">scale_vector</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">direction</span><span class="p">,</span> <span class="n">uc_b</span><span class="p">)</span>
         <span class="n">temp_a</span><span class="o">.</span><span class="n">make_supercell</span><span class="p">(</span><span class="n">scale_vector</span><span class="p">)</span>
         <span class="n">grain_b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_b_from_a</span><span class="p">(</span><span class="n">temp_a</span><span class="p">,</span> <span class="n">csl</span><span class="p">)</span>
+        <span class="c1"># grain_b = grain_a.copy()</span>
+        <span class="c1"># grain_b.rotate_sites(theta=np.radians(180), axis=(1, 0, 0), anchor=[.0, .0, .0])</span>
         <span class="c1"># make sure that all fractional coordinates that equal to 1 will become 0</span>
         <span class="n">grain_b</span><span class="o">.</span><span class="n">make_supercell</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
 
         <span class="n">scale_vector</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
-        <span class="n">scale_vector</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">gb_direction</span><span class="p">,</span> <span class="n">uc_a</span><span class="p">)</span>
+        <span class="n">scale_vector</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">direction</span><span class="p">,</span> <span class="n">uc_a</span><span class="p">)</span>
         <span class="n">grain_a</span><span class="o">.</span><span class="n">make_supercell</span><span class="p">(</span><span class="n">scale_vector</span><span class="p">)</span>
 
-        <span class="c1"># grain_b.to(filename=&#39;POSCAR&#39;)</span>
-        <span class="c1"># exit(0)</span>
-        <span class="k">return</span> <span class="n">grain_a</span><span class="p">,</span> <span class="n">grain_b</span></div>
+        <span class="c1"># grain_b.to(filename=&#39;POSCAR_b_1&#39;)</span>
+        <span class="c1"># exit()</span>
+        <span class="k">return</span> <span class="n">grain_a</span><span class="p">,</span> <span class="n">grain_b</span><span class="p">,</span> <span class="n">csl</span></div>
 
 <div class="viewcode-block" id="Grain.stack_grains"><a class="viewcode-back" href="../../aimsgb.html#aimsgb.grain.Grain.stack_grains">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">stack_grains</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">grain_a</span><span class="p">,</span> <span class="n">grain_b</span><span class="p">,</span> <span class="n">vacuum</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">gap</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
@@ -311,21 +361,23 @@
 <span class="sd">        Build an interface structure by stacking two grains along a given direction.</span>
 <span class="sd">        The grain_b a- and b-vectors will be forced to be the grain_a&#39;s</span>
 <span class="sd">        a- and b-vectors.</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            grain_a (Grain): Substrate for the interface structure</span>
 <span class="sd">            grain_b (Grain): Film for the interface structure</span>
 <span class="sd">            vacuum (float): Vacuum space above the film in Angstroms. Default to 0.0</span>
 <span class="sd">            gap (float): Gap between substrate and film in Angstroms. Default to 0.0</span>
-<span class="sd">            direction (int): Stacking direction of the interface structure. 0: x, 1: y, 2: z.</span>
+<span class="sd">            direction (int): Stacking direction of the interface structure. 0: a, 1: b, 2: c.</span>
 <span class="sd">            delete_layer (str): Delete top and bottom layers of the substrate and film.</span>
 <span class="sd">                8 characters in total. The first 4 characters is for the substrate and</span>
 <span class="sd">                the other 4 is for the film. &quot;b&quot; means bottom layer and &quot;t&quot; means</span>
 <span class="sd">                top layer. Integer represents the number of layers to be deleted.</span>
 <span class="sd">                Default to &quot;0b0t0b0t&quot;, which means no deletion of layers. The</span>
 <span class="sd">                direction of top and bottom layers is based on the given direction.</span>
-<span class="sd">            tol (float): Tolerance factor in Angstroms to determine whether two</span>
-<span class="sd">                atoms are at the same plane. Default to 0.25</span>
+<span class="sd">            tol (float): Tolerance factor in Angstrom to determnine if sites are </span>
+<span class="sd">                in the same layer. Default to 0.25.</span>
 <span class="sd">            to_primitive (bool): Whether to get primitive structure of GB. Default to true.</span>
+
 <span class="sd">        Returns:</span>
 <span class="sd">             GB structure (Grain)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -335,7 +387,7 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">delete_layer</span><span class="si">}</span><span class="s2">&#39; is not supported. Please make sure the format &quot;</span>
                              <span class="s2">&quot;is 0b0t0b0t.&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">delete</span><span class="p">):</span>
-            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">])):</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">])):</span>
                 <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
                     <span class="n">grain_a</span><span class="o">.</span><span class="n">delete_bt_layer</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">tol</span><span class="p">,</span> <span class="n">direction</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
@@ -350,12 +402,12 @@
         <span class="n">new_lat</span> <span class="o">=</span> <span class="n">Lattice</span><span class="o">.</span><span class="n">from_parameters</span><span class="p">(</span><span class="o">*</span><span class="n">abc_a</span><span class="p">,</span> <span class="o">*</span><span class="n">angles</span><span class="p">)</span>
         <span class="n">a_fcoords</span> <span class="o">=</span> <span class="n">new_lat</span><span class="o">.</span><span class="n">get_fractional_coords</span><span class="p">(</span><span class="n">grain_a</span><span class="o">.</span><span class="n">cart_coords</span><span class="p">)</span>
 
-        <span class="n">grain_a</span> <span class="o">=</span> <span class="n">Grain</span><span class="p">(</span><span class="n">new_lat</span><span class="p">,</span> <span class="n">grain_a</span><span class="o">.</span><span class="n">species</span><span class="p">,</span> <span class="n">a_fcoords</span><span class="p">)</span>
+        <span class="n">grain_a</span> <span class="o">=</span> <span class="n">Grain</span><span class="p">(</span><span class="n">new_lat</span><span class="p">,</span> <span class="n">grain_a</span><span class="o">.</span><span class="n">species</span><span class="p">,</span> <span class="n">a_fcoords</span><span class="p">,</span> <span class="n">site_properties</span><span class="o">=</span><span class="n">grain_a</span><span class="o">.</span><span class="n">site_properties</span><span class="p">)</span>
         <span class="n">l_vector</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
         <span class="n">l_vector</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">direction</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span>
         <span class="n">b_fcoords</span> <span class="o">=</span> <span class="n">new_lat</span><span class="o">.</span><span class="n">get_fractional_coords</span><span class="p">(</span>
             <span class="n">grain_b</span><span class="o">.</span><span class="n">cart_coords</span> <span class="o">+</span> <span class="n">l_vector</span><span class="p">)</span>
-        <span class="n">grain_b</span> <span class="o">=</span> <span class="n">Grain</span><span class="p">(</span><span class="n">new_lat</span><span class="p">,</span> <span class="n">grain_b</span><span class="o">.</span><span class="n">species</span><span class="p">,</span> <span class="n">b_fcoords</span><span class="p">)</span>
+        <span class="n">grain_b</span> <span class="o">=</span> <span class="n">Grain</span><span class="p">(</span><span class="n">new_lat</span><span class="p">,</span> <span class="n">grain_b</span><span class="o">.</span><span class="n">species</span><span class="p">,</span> <span class="n">b_fcoords</span><span class="p">,</span> <span class="n">site_properties</span><span class="o">=</span><span class="n">grain_b</span><span class="o">.</span><span class="n">site_properties</span><span class="p">)</span>
 
         <span class="n">structure</span> <span class="o">=</span> <span class="n">Grain</span><span class="o">.</span><span class="n">from_sites</span><span class="p">(</span><span class="n">grain_a</span><span class="p">[:]</span> <span class="o">+</span> <span class="n">grain_b</span><span class="p">[:])</span>
         <span class="n">structure</span> <span class="o">=</span> <span class="n">structure</span><span class="o">.</span><span class="n">get_sorted_structure</span><span class="p">()</span>

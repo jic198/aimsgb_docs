@@ -7,6 +7,7 @@
   <title>BCC Fe &mdash; aimsgb 0.1.2 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
@@ -14,10 +15,12 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="MoS2" href="MoS2.html" />
+    <link rel="next" title="FCC Ni" href="FCC_Ni.html" />
     <link rel="prev" title="Python examples" href="index.html" /> 
 </head>
 
@@ -50,8 +53,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../gui/index.html">GUI example</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Python examples</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">BCC Fe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="FCC_Ni.html">FCC Ni</a></li>
 <li class="toctree-l2"><a class="reference internal" href="MoS2.html">MoS2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Graphene.html">Graphene</a></li>
+<li class="toctree-l2"><a class="reference internal" href="SrTiO3.html">SrTiO3</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Find_GB.html">Find Grain Boundaries</a></li>
 </ul>
 </li>
@@ -89,10 +94,10 @@
 
 <span class="n">s_input</span> <span class="o">=</span> <span class="n">Grain</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="s2">&quot;POSCAR_Fe&quot;</span><span class="p">)</span>
 <span class="n">gb</span> <span class="o">=</span> <span class="n">GrainBoundary</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="mi">5</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">s_input</span><span class="p">)</span>
-<span class="n">structure</span> <span class="o">=</span> <span class="n">gb</span><span class="o">.</span><span class="n">build_gb</span><span class="p">()</span>
+<span class="n">structure</span> <span class="o">=</span> <span class="n">Grain</span><span class="o">.</span><span class="n">stack_grains</span><span class="p">(</span><span class="n">gb</span><span class="o">.</span><span class="n">grain_a</span><span class="p">,</span> <span class="n">gb</span><span class="o">.</span><span class="n">grain_b</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="n">gb</span><span class="o">.</span><span class="n">direction</span><span class="p">)</span>
 </pre></div>
 </div>
-<a class="reference internal image-reference" href="../_images/Fe_fig1.png"><img alt="../_images/Fe_fig1.png" src="../_images/Fe_fig1.png" style="width: 400px;" /></a>
+<a class="reference internal image-reference" href="../_images/Fe_fig11.png"><img alt="../_images/Fe_fig11.png" src="../_images/Fe_fig11.png" style="width: 400px;" /></a>
 <p><code class="docutils literal notranslate"><span class="pre">s_input</span></code> can also be created using <code class="docutils literal notranslate"><span class="pre">from_mp_id</span></code> method by giving an <code class="docutils literal notranslate"><span class="pre">mp_id</span></code> from <a class="reference external" href="https://materialsproject.org/">Materials Project</a>.
 The <code class="docutils literal notranslate"><span class="pre">mp_id</span></code> of a BCC Fe is <cite>mp-13</cite>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">s_input</span> <span class="o">=</span> <span class="n">Grain</span><span class="o">.</span><span class="n">from_mp_id</span><span class="p">(</span><span class="s2">&quot;mp-13&quot;</span><span class="p">)</span>
@@ -100,13 +105,13 @@ The <code class="docutils literal notranslate"><span class="pre">mp_id</span></c
 </div>
 <p>To construct a bigger supercell for each grain, say 2 unit cells:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gb</span> <span class="o">=</span> <span class="n">GrainBoundary</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="mi">5</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">s_input</span><span class="p">,</span> <span class="n">uc_a</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">uc_b</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="n">structure</span> <span class="o">=</span> <span class="n">gb</span><span class="o">.</span><span class="n">build_gb</span><span class="p">()</span>
+<span class="n">structure</span> <span class="o">=</span> <span class="n">Grain</span><span class="o">.</span><span class="n">stack_grains</span><span class="p">(</span><span class="n">gb</span><span class="o">.</span><span class="n">grain_a</span><span class="p">,</span> <span class="n">gb</span><span class="o">.</span><span class="n">grain_b</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="n">gb</span><span class="o">.</span><span class="n">direction</span><span class="p">)</span>
 </pre></div>
 </div>
-<a class="reference internal image-reference" href="../_images/Fe_fig2.png"><img alt="../_images/Fe_fig2.png" src="../_images/Fe_fig2.png" style="width: 400px;" /></a>
+<a class="reference internal image-reference" href="../_images/Fe_fig21.png"><img alt="../_images/Fe_fig21.png" src="../_images/Fe_fig21.png" style="width: 400px;" /></a>
 <p>To construct a Fe Σ5[001]/(001) twist grain boundary:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gb</span> <span class="o">=</span> <span class="n">GrainBoundary</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="mi">5</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">s_input</span><span class="p">)</span>
-<span class="n">structure</span> <span class="o">=</span> <span class="n">gb</span><span class="o">.</span><span class="n">build_gb</span><span class="p">()</span>
+<span class="n">structure</span> <span class="o">=</span> <span class="n">Grain</span><span class="o">.</span><span class="n">stack_grains</span><span class="p">(</span><span class="n">gb</span><span class="o">.</span><span class="n">grain_a</span><span class="p">,</span> <span class="n">gb</span><span class="o">.</span><span class="n">grain_b</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="n">gb</span><span class="o">.</span><span class="n">direction</span><span class="p">)</span>
 </pre></div>
 </div>
 <a class="reference internal image-reference" href="../_images/Fe_fig3.png"><img alt="../_images/Fe_fig3.png" src="../_images/Fe_fig3.png" style="width: 400px;" /></a>
@@ -114,7 +119,7 @@ The <code class="docutils literal notranslate"><span class="pre">mp_id</span></c
 let’s say we want to have one of the grain shifted for 0.2 Å along a-axis:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gb</span> <span class="o">=</span> <span class="n">GrainBoundary</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="mi">5</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">s_input</span><span class="p">)</span>
 <span class="n">gb</span><span class="o">.</span><span class="n">grain_a</span><span class="o">.</span><span class="n">translate_sites</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">gb</span><span class="o">.</span><span class="n">grain_a</span><span class="p">)),</span> <span class="p">[</span><span class="mf">0.2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
-<span class="n">structure</span> <span class="o">=</span> <span class="n">gb</span><span class="o">.</span><span class="n">build_gb</span><span class="p">()</span>
+<span class="n">structure</span> <span class="o">=</span> <span class="n">Grain</span><span class="o">.</span><span class="n">stack_grains</span><span class="p">(</span><span class="n">gb</span><span class="o">.</span><span class="n">grain_a</span><span class="p">,</span> <span class="n">gb</span><span class="o">.</span><span class="n">grain_b</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="n">gb</span><span class="o">.</span><span class="n">direction</span><span class="p">)</span>
 </pre></div>
 </div>
 <a class="reference internal image-reference" href="../_images/Fe_fig4.png"><img alt="../_images/Fe_fig4.png" src="../_images/Fe_fig4.png" style="width: 400px;" /></a>
@@ -125,7 +130,7 @@ let’s say we want to have one of the grain shifted for 0.2 Å along a-axis:</
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="index.html" class="btn btn-neutral float-left" title="Python examples" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="MoS2.html" class="btn btn-neutral float-right" title="MoS2" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="FCC_Ni.html" class="btn btn-neutral float-right" title="FCC Ni" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

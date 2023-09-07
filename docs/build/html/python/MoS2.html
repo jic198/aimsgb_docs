@@ -7,6 +7,7 @@
   <title>MoS2 &mdash; aimsgb 0.1.2 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
@@ -14,11 +15,13 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Graphene" href="Graphene.html" />
-    <link rel="prev" title="BCC Fe" href="BCC_Fe.html" /> 
+    <link rel="prev" title="FCC Ni" href="FCC_Ni.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -50,8 +53,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../gui/index.html">GUI example</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Python examples</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="BCC_Fe.html">BCC Fe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="FCC_Ni.html">FCC Ni</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">MoS2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Graphene.html">Graphene</a></li>
+<li class="toctree-l2"><a class="reference internal" href="SrTiO3.html">SrTiO3</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Find_GB.html">Find Grain Boundaries</a></li>
 </ul>
 </li>
@@ -89,7 +94,7 @@
 
 <span class="n">s_input</span> <span class="o">=</span> <span class="n">Grain</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="s2">&quot;POSCAR_MoS2&quot;</span><span class="p">)</span>
 <span class="n">gb</span> <span class="o">=</span> <span class="n">GrainBoundary</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="mi">5</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">s_input</span><span class="p">)</span>
-<span class="n">structure</span> <span class="o">=</span> <span class="n">gb</span><span class="o">.</span><span class="n">build_gb</span><span class="p">()</span>
+<span class="n">structure</span> <span class="o">=</span> <span class="n">Grain</span><span class="o">.</span><span class="n">stack_grains</span><span class="p">(</span><span class="n">gb</span><span class="o">.</span><span class="n">grain_a</span><span class="p">,</span> <span class="n">gb</span><span class="o">.</span><span class="n">grain_b</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="n">gb</span><span class="o">.</span><span class="n">direction</span><span class="p">)</span>
 </pre></div>
 </div>
 <a class="reference internal image-reference" href="../_images/MoS2_fig1.png"><img alt="../_images/MoS2_fig1.png" src="../_images/MoS2_fig1.png" style="width: 400px;" /></a>
@@ -102,7 +107,7 @@ The <code class="docutils literal notranslate"><span class="pre">mp_id</span></c
 </pre></div>
 </div>
 <p>Notice that some atoms at the grain boundary sit too close to each other. Let’s add 1 Å distance between the grains:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">structure</span> <span class="o">=</span> <span class="n">gb</span><span class="o">.</span><span class="n">build_gb</span><span class="p">(</span><span class="n">add_if_dist</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">structure</span> <span class="o">=</span> <span class="n">Grain</span><span class="o">.</span><span class="n">stack_grains</span><span class="p">(</span><span class="n">gb</span><span class="o">.</span><span class="n">grain_a</span><span class="p">,</span> <span class="n">gb</span><span class="o">.</span><span class="n">grain_b</span><span class="p">,</span> <span class="n">gap</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="n">gb</span><span class="o">.</span><span class="n">direction</span><span class="p">)</span>
 </pre></div>
 </div>
 <a class="reference internal image-reference" href="../_images/MoS2_fig2.png"><img alt="../_images/MoS2_fig2.png" src="../_images/MoS2_fig2.png" style="width: 400px;" /></a>
@@ -112,7 +117,7 @@ The <code class="docutils literal notranslate"><span class="pre">mp_id</span></c
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="BCC_Fe.html" class="btn btn-neutral float-left" title="BCC Fe" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="FCC_Ni.html" class="btn btn-neutral float-left" title="FCC Ni" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="Graphene.html" class="btn btn-neutral float-right" title="Graphene" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

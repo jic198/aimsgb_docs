@@ -6,6 +6,7 @@
   <title>aimsgb.grain_bound &mdash; aimsgb 0.1.2 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
@@ -13,6 +14,8 @@
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/doctools.js"></script>
         <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/clipboard.min.js"></script>
+        <script src="../../_static/copybutton.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -531,15 +534,24 @@
             <span class="n">sigma</span> <span class="o">=</span> <span class="n">reduce_sigma</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sigma</span> <span class="o">=</span> <span class="n">sigma</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">gb_info</span> <span class="o">=</span> <span class="n">GBInformation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sigma</span><span class="p">,</span> <span class="n">specific</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">gb_direction</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">csl</span><span class="o">.</span><span class="n">transpose</span><span class="p">()):</span>
+        <span class="n">csl</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gb_info</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">sigma</span><span class="p">][</span><span class="s2">&quot;GB plane&quot;</span><span class="p">]):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">plane</span> <span class="ow">in</span> <span class="n">v</span><span class="p">:</span>
+                <span class="n">csl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gb_info</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">sigma</span><span class="p">][</span><span class="s2">&quot;CSL matrix&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">csl</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">avail_plane</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">j</span><span class="p">))</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">i</span><span class="p">])</span>
+                                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">gb_info</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">sigma</span><span class="p">][</span><span class="s2">&quot;GB plane&quot;</span><span class="p">]])</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The given GB plane &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">plane_str</span><span class="si">}</span><span class="s2">&#39; cannot be realized. Choose &quot;</span>
+                            <span class="sa">f</span><span class="s2">&quot;the plane in [</span><span class="si">{</span><span class="n">avail_plane</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">csl</span><span class="o">.</span><span class="n">transpose</span><span class="p">()):</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">plane</span> <span class="o">==</span> <span class="nb">list</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">gb_direction</span> <span class="o">=</span> <span class="n">i</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="n">i</span>
         <span class="n">sg</span> <span class="o">=</span> <span class="n">SpacegroupAnalyzer</span><span class="p">(</span><span class="n">initial_struct</span><span class="p">)</span>
         <span class="n">new_s</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">get_conventional_standard_structure</span><span class="p">()</span>
         <span class="n">initial_struct</span> <span class="o">=</span> <span class="n">Grain</span><span class="o">.</span><span class="n">from_sites</span><span class="p">(</span><span class="n">new_s</span><span class="p">[:])</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_grain_a</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grain_b</span> <span class="o">=</span> <span class="n">initial_struct</span><span class="o">.</span><span class="n">build_grains</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">csl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gb_direction</span><span class="p">,</span> <span class="n">uc_a</span><span class="p">,</span> <span class="n">uc_b</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_grain_a</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grain_b</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">csl</span> <span class="o">=</span> <span class="n">initial_struct</span><span class="o">.</span><span class="n">build_grains</span><span class="p">(</span>
+            <span class="n">csl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span><span class="p">,</span> <span class="n">uc_a</span><span class="p">,</span> <span class="n">uc_b</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">rot_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -556,18 +568,18 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">gb_info</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">sigma</span><span class="p">][</span><span class="s2">&quot;Theta&quot;</span><span class="p">]</span>
 
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">csl</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        CSL matrix</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gb_info</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">sigma</span><span class="p">][</span><span class="s2">&quot;GB plane&quot;</span><span class="p">]):</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">plane</span> <span class="ow">in</span> <span class="n">v</span><span class="p">:</span>
-                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">gb_info</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">sigma</span><span class="p">][</span><span class="s2">&quot;CSL matrix&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
-        <span class="n">avail_plane</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">j</span><span class="p">))</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">i</span><span class="p">])</span>
-                                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">gb_info</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">sigma</span><span class="p">][</span><span class="s2">&quot;GB plane&quot;</span><span class="p">]])</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The given GB plane &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">plane_str</span><span class="si">}</span><span class="s2">&#39; cannot be realized. Choose &quot;</span>
-                         <span class="sa">f</span><span class="s2">&quot;the plane in [</span><span class="si">{</span><span class="n">avail_plane</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+    <span class="c1"># @property</span>
+    <span class="c1"># def csl(self):</span>
+    <span class="c1">#     &quot;&quot;&quot;</span>
+    <span class="c1">#     CSL matrix</span>
+    <span class="c1">#     &quot;&quot;&quot;</span>
+    <span class="c1">#     for i, v in enumerate(self.gb_info[self.sigma][&quot;GB plane&quot;]):</span>
+    <span class="c1">#         if self.plane in v:</span>
+    <span class="c1">#             return self.gb_info[self.sigma][&quot;CSL matrix&quot;][i]</span>
+    <span class="c1">#     avail_plane = &quot;, &quot;.join([&quot;, &quot;.join([&quot; &quot;.join(map(str, j)) for j in i])</span>
+    <span class="c1">#                              for i in self.gb_info[self.sigma][&quot;GB plane&quot;]])</span>
+    <span class="c1">#     raise ValueError(f&quot;The given GB plane &#39;{self.plane_str}&#39; cannot be realized. Choose &quot;</span>
+    <span class="c1">#                      f&quot;the plane in [{avail_plane}]&quot;)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">grain_a</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -601,14 +613,16 @@
 <span class="sd">                the other 4 is for grain B. &quot;b&quot; means bottom layer and &quot;t&quot; means</span>
 <span class="sd">                top layer. Integer represents the number of layers to be deleted.</span>
 <span class="sd">                Default to &quot;0b0t0b0t&quot;, which means no deletion of layers. The</span>
-<span class="sd">                direction of top and bottom layers is based on gb_direction.</span>
+<span class="sd">                direction of top and bottom layers is based on direction.</span>
 <span class="sd">            tol (float), Angstrom: Tolerance factor to determine whether two</span>
 <span class="sd">                atoms are at the same plane.</span>
 <span class="sd">                Default to 0.25</span>
 <span class="sd">        Returns:</span>
 <span class="sd">             GB structure (Grain)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">ind</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gb_direction</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;The build_gb method is deprecated. Please use Grain.stack_grains methode instead.&quot;</span><span class="p">)</span>
+        
+        <span class="n">ind</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span>
         <span class="n">delete_layer</span> <span class="o">=</span> <span class="n">delete_layer</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
         <span class="n">delete</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">&#39;(\d+)(\w)&#39;</span><span class="p">,</span> <span class="n">delete_layer</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">delete</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">4</span><span class="p">:</span>
