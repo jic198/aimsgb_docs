@@ -11,6 +11,7 @@ Python examples
     MoS2
     Graphene
     SrTiO3
+    LiNiO2
     Find_GB
 
 More to come.
