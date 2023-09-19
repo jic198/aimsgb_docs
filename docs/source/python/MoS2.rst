@@ -14,10 +14,6 @@ Let's take MoS2 Σ5[001]/(130) tilt grain boundary as an example. The initial st
 .. image:: images/MoS2_fig1.png
     :width: 400px
 
-You will see a warning saying "The lattice system of the grain is not orthogonal. aimsgb will find a supercell of the grain structure that is orthogonalized. This may take a while." 
-It took me 3 min to generate the MoS2 grain boundary structure on my laptop. What takes it so long is the process of calculating the transformation matrix. In the future, I may store
-the transformation matrices in a database so that it doesn't need to be calculated every time.
-
 ``s_input`` can also be created using ``from_mp_id`` method by giving an ``mp_id`` from `Materials Project <https://materialsproject.org/>`_. 
 The ``mp_id`` of MoS2 is `mp-2815`::
 
